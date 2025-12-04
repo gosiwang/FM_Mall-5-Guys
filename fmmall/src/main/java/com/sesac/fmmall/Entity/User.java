@@ -42,7 +42,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PaymentMethod> paymentMethods;
 
+    public void encodePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
 }
