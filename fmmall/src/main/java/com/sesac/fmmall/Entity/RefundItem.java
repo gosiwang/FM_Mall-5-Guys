@@ -35,4 +35,8 @@ public class RefundItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_item_id", nullable = false)
     private OrderItem orderItem;
+
+    public void changeStatus(RefundStatus status) {
+        this.refundStatus = status;
+    }
 }
