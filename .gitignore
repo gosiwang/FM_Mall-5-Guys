@@ -38,6 +38,10 @@ out/
 
 
 ### Local config ###
-src/main/resources/application.yml
-src/main/resources/application-local.yml
-src/main/resources/application-*.yml
+fmmall/src/main/resources/application.yml
+fmmall/src/main/resources/application-local.yml
+fmmall/src/main/resources/application-*.yml
+
+fmmall/src/test/resources/application.yml
+fmmall/src/test/resources/application-local.yml
+fmmall/src/test/resources/application-*-local.yml

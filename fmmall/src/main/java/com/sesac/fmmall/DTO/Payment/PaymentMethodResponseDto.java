@@ -12,7 +12,7 @@ public class PaymentMethodResponseDto {
     private Boolean isDefault;
 
     public PaymentMethodResponseDto(PaymentMethod pm) {
-        this.id = pm.getId();
+        this.id = pm.getPaymentMethodId();
         this.cardCompany = pm.getCardCompany();
         this.maskedCardNumber = pm.getMaskedCardNumber();
         this.isDefault = pm.getIsDefault();

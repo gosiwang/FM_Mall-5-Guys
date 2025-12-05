@@ -37,7 +37,7 @@ public class RefundService {
         Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId=" + request.getOrderId()));
 
-        if (order.getUser().getId() != userId) {
+        if (order.getUser().getUserId() != userId) {
             throw new IllegalArgumentException("본인의 주문에 대해서만 환불을 요청할 수 있습니다.");
         }
 
@@ -119,7 +119,7 @@ public class RefundService {
     public List<RefundResponse> getRefundsByUser(Integer userId) {
 
         // userId 기준으로 주문 조회 → 각 주문의 환불 목록
-        List<Order> orders = orderRepository.findByUser_Id(userId);
+        List<Order> orders = orderRepository.findByUser_UserId(userId);
 
         List<Refund> allRefunds = new ArrayList<>();
         for (Order order : orders) {
@@ -136,14 +136,14 @@ public class RefundService {
     public List<RefundResponse> getRefundsByUserAndProduct(Integer userId, Integer productId) {
 
         // productId로 주문상품 찾기
-        List<OrderItem> orderItems = orderItemRepository.findByProduct_Id(productId);
+        List<OrderItem> orderItems = orderItemRepository.findByProduct_ProductId(productId);
 
         Set<Integer> refundIdSet = new LinkedHashSet<>();
         List<Refund> resultRefunds = new ArrayList<>();
 
         for (OrderItem orderItem : orderItems) {
             // 해당 주문이 userId의 주문인지 확인
-            if (orderItem.getOrder().getUser().getId() != userId) {
+            if (orderItem.getOrder().getUser().getUserId() != userId) {
                 continue;
             }
 

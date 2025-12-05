@@ -29,8 +29,8 @@ public class InquiryResponseDTO {
         this.inquiryContent = inquiry.getInquiryContent();
         this.createdAt = inquiry.getCreatedAt();
         this.updatedAt = inquiry.getUpdatedAt();
-        this.userId = inquiry.getUser().getId();
-        this.productId = inquiry.getProduct().getId();
+        this.userId = inquiry.getUser().getUserId();
+        this.productId = inquiry.getProduct().getProductId();
 
     }
 }
