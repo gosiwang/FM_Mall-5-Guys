@@ -13,7 +13,7 @@ public class UserResponseDto {
     private String role;
 
     public UserResponseDto(User user) {
-        this.id = user.getId();
+        this.id = user.getUserId();
         this.loginId = user.getLoginId();
         this.userName = user.getUserName();
         this.userPhone = user.getUserPhone();

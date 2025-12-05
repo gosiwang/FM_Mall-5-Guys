@@ -15,7 +15,7 @@ public class AddressResponseDto {
     private String isDefault;
 
     public AddressResponseDto(Address address) {
-        this.id = address.getId();
+        this.id = address.getAddressId();
         this.receiverName = address.getReceiverName();
         this.receiverPhone = address.getReceiverPhone();
         this.zipcode = address.getZipcode();
