@@ -27,7 +27,7 @@ public class InquiryService {
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
 
-    /* 1. 메뉴 코드로 상세 조회 */
+    /* 1. 문의 코드로 상세 조회 */
     public InquiryResponseDTO findInquiryByInquiryId(int inquiryId) {
         Inquiry foundInquiry = inquiryRepository.findById(inquiryId).orElseThrow(
                 () -> new IllegalArgumentException("해당 ID를 가진 문의가 존재하지 않습니다."));
@@ -35,7 +35,7 @@ public class InquiryService {
 //        return new InquiryResponseDTO(foundInquiry);
         return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
     }
-    /* 2. 메뉴 최신순 상세 조회 */
+    /* 2. 문의 최신순 상세 조회 */
     public Page<InquiryResponseDTO> findAllSortedUpdatedAt(Pageable pageable) {
         int page = pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1;
         int size = pageable.getPageSize();
@@ -54,7 +54,7 @@ public class InquiryService {
     public InquiryResponseDTO registInquiry(InquiryRequestDTO requestDTO) {
         User user = userRepository.findById(requestDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-        Product product = productRepository.findById(Math.toIntExact(requestDTO.getProductId()))
+        Product product = productRepository.findById(requestDTO.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
         // DTO -> Entity 변환 (builder 패턴 사용)

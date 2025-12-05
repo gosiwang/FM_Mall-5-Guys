@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class InquiryAnswerRequestDTO {
-    private String inquiryContent;
+    private String inquiryAnswerContent;
     private int userId;
     private int inquiryId;
 }

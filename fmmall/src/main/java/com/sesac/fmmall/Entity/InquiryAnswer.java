@@ -40,7 +40,7 @@ public class InquiryAnswer {
 
     public void modifyContent(String inquiryAnswerContent) {
         this.inquiryAnswerContent = inquiryAnswerContent;
-//        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
 

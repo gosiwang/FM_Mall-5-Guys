@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class InquiryController {
 
-    private final InquiryRepository inquiryRepository;
     private final InquiryService inquiryService;
 
     /* 1. 특정 아이디로 조회 */
@@ -44,7 +43,7 @@ public class InquiryController {
     }
 
     /* 4. 문의 수정 */
-    @PutMapping("/modify/{InquiryId}")
+    @PutMapping("/modify/{inquiryId}")
     public ResponseEntity<InquiryResponseDTO> modifyInquiry(@PathVariable int inquiryId, @RequestBody InquiryRequestDTO requestDTO) {
         InquiryResponseDTO updatedInquiry = inquiryService.modifyInquiryContent(inquiryId, requestDTO);
 //        신규 리소스 생성 시 201 CREATED 상태 코드 반환
@@ -52,7 +51,7 @@ public class InquiryController {
     }
 
     /* 5. 문의 삭제 */
-    @DeleteMapping("/delete/{InquiryId} ")
+    @DeleteMapping("/delete/{inquiryId} ")
     public ResponseEntity<Void> deleteinquiry(@PathVariable int inquiryId) {
 
         inquiryService.deleteInquiry(inquiryId);

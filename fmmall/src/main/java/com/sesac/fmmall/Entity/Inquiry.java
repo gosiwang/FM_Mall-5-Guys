@@ -44,7 +44,9 @@ public class Inquiry {
 
     public void modifyContent(String inquiryContent) {
         this.inquiryContent = inquiryContent;
-//        this.updatedAt = LocalDateTime.now();
+        // db에서는 제대로 들어가지만, jpa에서는 바로 값을 못 가져옴. 그래서 직접 값을 대입하는 형식으로 사용
+        // 수정 시간이라 오차가 1초 정도 발생해도 크게 상관없을 듯.
+        this.updatedAt = LocalDateTime.now();
     }
 
 
