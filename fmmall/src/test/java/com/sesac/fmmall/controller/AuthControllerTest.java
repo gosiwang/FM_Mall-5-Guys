@@ -7,31 +7,41 @@ import com.sesac.fmmall.Repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest
+@AutoConfigureMockMvc
 @Transactional
 class AuthControllerTest {
 
     @Autowired
-    WebTestClient webTestClient;
+    MockMvc mockMvc;
 
-    final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Autowired
     UserRepository userRepository;
 
-    String testLoginId = "testUser01";
+    String testLoginId = "testUser02";
     String testPassword = "1234";
 
+    @Test
     @BeforeEach
     void setUp() throws Exception {
+
+        // 🔥 먼저 전부 지우고 시작
+        userRepository.deleteAll();
 
         UserSaveRequestDto signupDto = new UserSaveRequestDto();
         signupDto.setLoginId(testLoginId);
@@ -39,11 +49,10 @@ class AuthControllerTest {
         signupDto.setUserName("테스터");
         signupDto.setUserPhone("010-1111-2222");
 
-        webTestClient.post().uri("/auth/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(signupDto))
-                .exchange()
-                .expectStatus().isOk();
+        mockMvc.perform(post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signupDto)))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -54,16 +63,14 @@ class AuthControllerTest {
         loginDto.setLoginId(testLoginId);
         loginDto.setPassword(testPassword);
 
-        webTestClient.post().uri("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(loginDto))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.accessToken").exists()
-                .jsonPath("$.tokenType").isEqualTo("Bearer")
-                .jsonPath("$.loginId").isEqualTo(testLoginId)
-                .jsonPath("$.role").isEqualTo("USER");
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").exists())
+                .andExpect(jsonPath("$.tokenType").value("Bearer"))
+                .andExpect(jsonPath("$.loginId").value(testLoginId))
+                .andExpect(jsonPath("$.role").value("USER"));
     }
 
     @Test
@@ -74,10 +81,9 @@ class AuthControllerTest {
         loginDto.setLoginId(testLoginId);
         loginDto.setPassword("wrongPW");
 
-        webTestClient.post().uri("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(loginDto))
-                .exchange()
-                .expectStatus().is4xxClientError();
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDto)))
+                .andExpect(status().is4xxClientError());
     }
 }
