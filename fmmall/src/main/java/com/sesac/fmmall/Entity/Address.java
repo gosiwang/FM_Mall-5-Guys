@@ -1,6 +1,5 @@
 package com.sesac.fmmall.Entity;
 
-import com.sesac.fmmall.Entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,7 +17,7 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id")
-    private int id;
+    private int addressId;
 
     @Column(name = "receiver_name", nullable = false, length = 15)
     private String receiverName;
