@@ -10,11 +10,14 @@ import com.sesac.fmmall.Repository.ProductRepository;
 import com.sesac.fmmall.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,14 +25,15 @@ public class InquiryService {
     private final InquiryRepository inquiryRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ModelMapper modelMapper;
 
     /* 1. 메뉴 코드로 상세 조회 */
     public InquiryResponseDTO findInquiryByInquiryId(int inquiryId) {
         Inquiry foundInquiry = inquiryRepository.findById(inquiryId).orElseThrow(
                 () -> new IllegalArgumentException("해당 ID를 가진 문의가 존재하지 않습니다."));
 
-        return new InquiryResponseDTO(foundInquiry);
-//        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
+//        return new InquiryResponseDTO(foundInquiry);
+        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
     }
     /* 2. 메뉴 최신순 상세 조회 */
     public Page<InquiryResponseDTO> findAllSortedUpdatedAt(Pageable pageable) {
@@ -40,7 +44,8 @@ public class InquiryService {
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
         Page<Inquiry> InquiryList = inquiryRepository.findAllByOrderByUpdatedAtDesc(pageRequest);
-        return InquiryList.map(InquiryResponseDTO::new);
+//        return InquiryList.map(InquiryResponseDTO::new);
+        return InquiryList.map(inquiry -> modelMapper.map(inquiry, InquiryResponseDTO.class));
 //        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
     }
 
@@ -63,8 +68,8 @@ public class InquiryService {
         Inquiry savedInquiry = inquiryRepository.save(newInquiry);
 
         // 저장 후, 생성된 Entity를 다시 DTO로 변환하여 반환
-//        return modelMapper.map(savedMenu, MenuResponseDTO.class);
-        return new InquiryResponseDTO(savedInquiry);
+        return modelMapper.map(savedInquiry, InquiryResponseDTO.class);
+//        return new InquiryResponseDTO(savedInquiry);
     }
 
     /* 4. 문의 수정 */
@@ -78,7 +83,8 @@ public class InquiryService {
             requestDTO.getInquiryContent()
         );
 
-        return new InquiryResponseDTO(foundInquiry);
+        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
+//        return new InquiryResponseDTO(foundInquiry);
     }
 
     /* 5. 문의 삭제 */

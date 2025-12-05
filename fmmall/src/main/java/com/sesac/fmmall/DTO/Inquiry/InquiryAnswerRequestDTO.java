@@ -9,8 +9,8 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
-public class InquiryRequestDTO {
+public class InquiryAnswerRequestDTO {
     private String inquiryContent;
     private int userId;
-    private int productId;
+    private int inquiryId;
 }
