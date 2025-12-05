@@ -63,4 +63,24 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Refund> refunds = new ArrayList<>();
+
+    // 🔹 주문 아이템 추가 (양방향 연관관계 관리)
+    public void addOrderItem(OrderItem orderItem) {
+        this.orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
+
+    // 🔹 환불 추가 (양방향)
+    public void addRefund(Refund refund) {
+        this.refunds.add(refund);
+        refund.setOrder(this);
+    }
+
+    // 🔹 주문 총 금액 계산 (상품가격 * 수량)
+    public int calculateTotalPrice() {
+        if (orderItems == null) return 0;
+        return orderItems.stream()
+                .mapToInt(OrderItem::calculateLineTotalPrice)
+                .sum();
+    }
 }
