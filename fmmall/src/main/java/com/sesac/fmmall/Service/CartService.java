@@ -39,7 +39,7 @@ public class CartService {
         Product product = productRepository.findById(requestDTO.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
-        Cart cart = cartRepository.findByUser_Id(userId)
+        Cart cart = cartRepository.findByUser_UserId(userId)
                 .orElseGet(() -> cartRepository.save(Cart.builder().user(user).build()));
 
         CartItem newCartItem = CartItem.createCartItem(product, requestDTO.getQuantity());
@@ -66,13 +66,13 @@ public class CartService {
 
     @Transactional
     public void clearCart(int userId) {
-        Cart cart = cartRepository.findByUser_Id(userId)
+        Cart cart = cartRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자의 장바구니를 찾을 수 없습니다."));
         cart.clearCart();
     }
 
     public CartResponseDTO findAllCartItems(int userId) {
-        Optional<Cart> optCart = cartRepository.findByUser_Id(userId);
+        Optional<Cart> optCart = cartRepository.findByUser_UserId(userId);
 
         if (optCart.isEmpty()) {
             return CartResponseDTO.builder()
