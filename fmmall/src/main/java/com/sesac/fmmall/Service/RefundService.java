@@ -29,11 +29,11 @@ public class RefundService {
 
     private final ModelMapper modelMapper;
 
-    /* Refund/insert/{userId} / POST / 환불 요청 생성 */
+
     @Transactional
     public RefundResponse createRefund(Integer userId, RefundCreateRequest request) {
 
-        // 주문 조회
+
         Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId=" + request.getOrderId()));
 
@@ -41,7 +41,7 @@ public class RefundService {
             throw new IllegalArgumentException("본인의 주문에 대해서만 환불을 요청할 수 있습니다.");
         }
 
-        // 결제 조회
+
         Payment payment = paymentRepository.findById(request.getPaymentId())
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다. paymentId=" + request.getPaymentId()));
 
@@ -49,7 +49,7 @@ public class RefundService {
             throw new IllegalArgumentException("주문과 결제 정보가 일치하지 않습니다.");
         }
 
-        // 환불 타입 파싱 (FULL / PARTIAL)
+
         RefundType refundType = RefundType.valueOf(request.getRefundType());
 
         Refund refund = Refund.builder()
@@ -57,7 +57,7 @@ public class RefundService {
                 .reasonDetail(request.getReasonDetail())
                 .totalAmount(0)
                 .refundType(refundType)
-                .isTrue(YesNo.N)   // 초기 상태: 확정 전
+                .isTrue(YesNo.N)
                 .order(order)
                 .payment(payment)
                 .build();
@@ -66,7 +66,7 @@ public class RefundService {
             throw new IllegalArgumentException("환불 상품이 없습니다.");
         }
 
-        // 환불아이템 생성
+
         for (RefundItemCreateRequest itemReq : request.getItems()) {
 
             OrderItem orderItem = orderItemRepository.findById(itemReq.getOrderItemId())
@@ -82,7 +82,7 @@ public class RefundService {
                 throw new IllegalArgumentException("환불 수량은 1개 이상이어야 합니다.");
             }
 
-            // 이미 환불된 수량 계산
+
             int alreadyRefunded = refundItemRepository.findByOrderItem(orderItem).stream()
                     .mapToInt(RefundItem::getRefundQuantity)
                     .sum();
