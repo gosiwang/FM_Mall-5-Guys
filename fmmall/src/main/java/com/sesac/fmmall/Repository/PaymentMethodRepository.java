@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface PaymentMethodRepository extends JpaRepository<PaymentMethod,Integer> {
 
-    List<PaymentMethod> findByUserId(Integer userId);
+    List<PaymentMethod> findByUser_UserId(Integer userId);
 
-    Optional<PaymentMethod> findByUserIdAndIsDefault(Integer userId, Boolean isDefault);
+    Optional<PaymentMethod> findByUser_UserIdAndIsDefault(Integer userId, Boolean isDefault);
 }

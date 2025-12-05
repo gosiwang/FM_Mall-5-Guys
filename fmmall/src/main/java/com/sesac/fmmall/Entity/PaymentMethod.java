@@ -1,6 +1,5 @@
 package com.sesac.fmmall.Entity;
 
-import com.sesac.fmmall.Entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,7 +17,7 @@ public class PaymentMethod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_method_id")
-    private int id;
+    private int paymentMethodId;
 
     @Column(name = "card_company", nullable = false, length = 20)
     private String cardCompany;

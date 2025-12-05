@@ -18,7 +18,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private int id;
+    private int userId;
 
     @Column(name = "login_id", nullable = false, unique = true, length = 30)
     private String loginId;
@@ -42,7 +42,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PaymentMethod> paymentMethods;
 
+    public void encodePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
 }

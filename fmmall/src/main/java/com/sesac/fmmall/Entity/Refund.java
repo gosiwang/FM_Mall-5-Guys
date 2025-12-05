@@ -51,4 +51,18 @@ public class Refund {
     @OneToMany(mappedBy = "refund", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<RefundItem> refundItems = new ArrayList<>();
+
+    // 🔹 환불 아이템 추가
+    public void addRefundItem(RefundItem refundItem) {
+        this.refundItems.add(refundItem);
+        refundItem.setRefund(this);
+    }
+
+    // 🔹 총 환불 금액 계산
+    public int calculateTotalAmount() {
+        if (refundItems == null) return 0;
+        return refundItems.stream()
+                .mapToInt(RefundItem::getRefundPrice)
+                .sum();
+    }
 }
