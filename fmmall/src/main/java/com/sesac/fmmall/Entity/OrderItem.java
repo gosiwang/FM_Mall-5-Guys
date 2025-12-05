@@ -42,4 +42,11 @@ public class OrderItem {
     @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<RefundItem> refundItems = new ArrayList<>();
+
+    public int calculateLineTotalPrice() {
+        if (product == null || product.getPrice() == null || quantity == null) {
+            throw new IllegalStateException("라인 금액을 계산할 수 없습니다. 상품/수량 정보가 없습니다.");
+        }
+        return product.getPrice() * quantity;
+    }
 }
