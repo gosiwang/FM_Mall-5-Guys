@@ -30,7 +30,7 @@ public class InquiryResponseDTO {
         this.createdAt = inquiry.getCreatedAt();
         this.updatedAt = inquiry.getUpdatedAt();
         this.userId = inquiry.getUser().getUserId();
-        this.productId = inquiry.getProduct().getId();
+        this.productId = inquiry.getProduct().getProductId();
 
     }
 }

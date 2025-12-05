@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -68,7 +69,7 @@ public class OrderService {
 
             if (product.getStockQuantity() < qty) {
                 throw new IllegalArgumentException(
-                        "상품 재고가 부족합니다. productId=" + product.getId()
+                        "상품 재고가 부족합니다. productId=" + product.getProductId()
                                 + ", stock=" + product.getStockQuantity()
                                 + ", requested=" + qty
                 );
@@ -112,7 +113,7 @@ public class OrderService {
     @Transactional
     public List<OrderResponse> getOrdersByUser(Integer userId) {
 
-        List<Order> orders = orderRepository.findByUser_Id(userId);
+        List<Order> orders = orderRepository.findByUser_UserId(userId);
 
         return orders.stream()
                 .map(this::mapToOrderResponse)
@@ -126,7 +127,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId=" + orderId));
 
-        if (order.getUser().getId() != userId) {
+        if (order.getUser().getUserId() != userId) {
             throw new IllegalArgumentException("본인의 주문만 조회할 수 있습니다.");
         }
 
@@ -137,14 +138,14 @@ public class OrderService {
     @Transactional
     public List<OrderResponse> getOrdersByUserAndProduct(Integer userId, Integer productId) {
 
-        List<OrderItem> orderItems = orderItemRepository.findByProduct_Id(productId);
+        List<OrderItem> orderItems = orderItemRepository.findByProduct_ProductId(productId);
 
         // userId로 필터링 + 주문 중복 제거
         Map<Integer, Order> uniqueOrders = new LinkedHashMap<>();
 
         for (OrderItem item : orderItems) {
             Order order = item.getOrder();
-            if (order.getUser().getId() == userId) {
+            if (order.getUser().getUserId() == userId) {
                 uniqueOrders.putIfAbsent(order.getId(), order);
             }
         }
@@ -163,7 +164,7 @@ public class OrderService {
 
         Order order = orderItem.getOrder();
 
-        if (order.getUser().getId() != userId) {
+        if (order.getUser().getUserId() != userId) {
             throw new IllegalArgumentException("본인의 주문만 조회할 수 있습니다.");
         }
 
@@ -177,7 +178,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId=" + orderId));
 
-        if (order.getUser().getId() != userId) {
+        if (order.getUser().getUserId() != userId) {
             throw new IllegalArgumentException("본인의 주문만 취소할 수 있습니다.");
         }
 
@@ -225,7 +226,7 @@ public class OrderService {
 
         // 이름이 다른 필드 수동 보정
         dto.setOrderId(order.getId());
-        dto.setUserId(order.getUser().getId());
+        dto.setUserId(order.getUser().getUserId());
 
         // 주문상품 리스트 매핑
         List<OrderItemResponse> itemDtos = order.getOrderItems().stream()
@@ -255,7 +256,7 @@ public class OrderService {
         OrderItemResponse dto = modelMapper.map(item, OrderItemResponse.class);
 
         dto.setOrderItemId(item.getId());
-        dto.setProductId(item.getProduct().getId());
+        dto.setProductId(item.getProduct().getProductId());
         dto.setProductName(item.getProduct().getName());
         dto.setProductPrice(item.getProduct().getPrice());
         dto.setLineTotalPrice(item.calculateLineTotalPrice());

@@ -12,7 +12,6 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 public class Cart {
 
     @Id
@@ -22,6 +21,7 @@ public class Cart {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
@@ -39,7 +39,7 @@ public class Cart {
         int stock = product.getStockQuantity(); // 현재 상품 재고
 
         CartItem existingItem = cartItems.stream()
-                .filter(item -> item.getProduct() != null && Objects.equals(item.getProduct().getId(), product.getId()))
+                .filter(item -> item.getProduct() != null && Objects.equals(item.getProduct().getProductId(), product.getProductId()))
                 .findFirst()
                 .orElse(null);
 
