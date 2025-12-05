@@ -17,7 +17,7 @@ public class RowCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "row_category_id")
-    private int id;
+    private int rowCategoryId;
 
     @Column(name = "row_category_name", nullable = false, length = 100)
     private String name;
