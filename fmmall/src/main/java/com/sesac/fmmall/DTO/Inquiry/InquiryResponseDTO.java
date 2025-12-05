@@ -10,6 +10,7 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @ToString
 @NoArgsConstructor
 public class InquiryResponseDTO {

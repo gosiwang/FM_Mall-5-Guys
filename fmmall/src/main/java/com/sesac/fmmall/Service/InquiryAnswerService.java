@@ -74,7 +74,7 @@ public class InquiryAnswerService {
 //        return InquiryAnswerResponseDTO.from(savedInquiryAnswer);
 
         return InquiryAnswerResponseDTO.builder()
-                .userId(savedInquiryAnswer.getUser().getId())       // user.getId()로 해도 되지만, 그냥 안전하게 save한 걸로 받아옴.
+                .userId(savedInquiryAnswer.getUser().getUserId())       // user.getUserId()로 해도 되지만, 그냥 안전하게 save한 걸로 받아옴.
                 .inquiryId(savedInquiryAnswer.getInquiry().getInquiryId())
                 .inquiryAnswerContent(savedInquiryAnswer.getInquiryAnswerContent())
                 .createdAt(savedInquiryAnswer.getCreatedAt())

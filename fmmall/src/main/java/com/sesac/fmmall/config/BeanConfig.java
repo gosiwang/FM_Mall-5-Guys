@@ -1,4 +1,4 @@
-package com.sesac.fmmall.config;
+package com.sesac.fmmall.Config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

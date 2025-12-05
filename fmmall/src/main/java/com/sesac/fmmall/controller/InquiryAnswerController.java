@@ -1,4 +1,4 @@
-package com.sesac.fmmall.Controller;
+package com.sesac.fmmall.controller;
 
 import com.sesac.fmmall.DTO.Inquiry.InquiryAnswerRequestDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryAnswerResponseDTO;
