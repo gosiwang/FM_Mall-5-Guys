@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -138,6 +137,7 @@ public class OrderService {
     @Transactional
     public List<OrderResponse> getOrdersByUserAndProduct(Integer userId, Integer productId) {
 
+        // productId 기준으로 주문상품 조회
         List<OrderItem> orderItems = orderItemRepository.findByProduct_ProductId(productId);
 
         // userId로 필터링 + 주문 중복 제거
@@ -146,7 +146,7 @@ public class OrderService {
         for (OrderItem item : orderItems) {
             Order order = item.getOrder();
             if (order.getUser().getUserId() == userId) {
-                uniqueOrders.putIfAbsent(order.getId(), order);
+                uniqueOrders.putIfAbsent(order.getOrderId(), order);
             }
         }
 
@@ -225,7 +225,7 @@ public class OrderService {
         OrderResponse dto = modelMapper.map(order, OrderResponse.class);
 
         // 이름이 다른 필드 수동 보정
-        dto.setOrderId(order.getId());
+        dto.setOrderId(order.getOrderId());
         dto.setUserId(order.getUser().getUserId());
 
         // 주문상품 리스트 매핑
@@ -238,7 +238,7 @@ public class OrderService {
         PaymentSummaryResponse paymentDto = null;
         if (order.getPayment() != null) {
             paymentDto = modelMapper.map(order.getPayment(), PaymentSummaryResponse.class);
-            paymentDto.setPaymentId(order.getPayment().getId());
+            paymentDto.setPaymentId(order.getPayment().getPaymentId());
         }
         dto.setPayment(paymentDto);
 
@@ -255,7 +255,7 @@ public class OrderService {
 
         OrderItemResponse dto = modelMapper.map(item, OrderItemResponse.class);
 
-        dto.setOrderItemId(item.getId());
+        dto.setOrderItemId(item.getOrderItemId());
         dto.setProductId(item.getProduct().getProductId());
         dto.setProductName(item.getProduct().getName());
         dto.setProductPrice(item.getProduct().getPrice());
@@ -267,7 +267,7 @@ public class OrderService {
     private RefundSummaryResponse mapToRefundSummaryResponse(Refund refund) {
 
         return RefundSummaryResponse.builder()
-                .refundId(refund.getId())
+                .refundId(refund.getRefundId())
                 .refundType(refund.getRefundType().name())
                 .totalAmount(refund.getTotalAmount())
                 .isTrue(refund.getIsTrue().name())
