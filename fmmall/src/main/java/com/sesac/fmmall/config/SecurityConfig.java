@@ -31,8 +31,10 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(b -> b.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/signup").permitAll()
+                        .requestMatchers("/User/login", "/User/signup").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
+
                 )
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
