@@ -33,7 +33,7 @@ public class CartService {
     private final ModelMapper modelMapper;
 
     @Transactional
-    public void addCartItem(int userId, CartItemRequestDTO requestDTO) {
+    public CartResponseDTO createCartItem(int userId, CartItemRequestDTO requestDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         Product product = productRepository.findById(requestDTO.getProductId())
@@ -45,13 +45,18 @@ public class CartService {
         CartItem newCartItem = CartItem.createCartItem(product, requestDTO.getQuantity());
         cart.addCartItem(newCartItem);
         cartRepository.save(cart);
+
+        return findAllCartItems(userId);
     }
 
     @Transactional
-    public void updateCartItemQuantity(int cartItemId, CartItemRequestDTO requestDTO) {
+    public CartResponseDTO updateCartItemQuantity(int cartItemId, CartItemRequestDTO requestDTO) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 상품을 찾을 수 없습니다."));
         cartItem.updateQuantity(requestDTO.getQuantity());
+
+        int userId = cartItem.getCart().getUser().getUserId();
+        return findAllCartItems(userId);
     }
 
     @Transactional
