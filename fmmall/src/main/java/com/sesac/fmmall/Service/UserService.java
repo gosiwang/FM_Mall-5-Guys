@@ -1,10 +1,9 @@
-// com.sesac.fmmall.Service.UserService
-
 package com.sesac.fmmall.Service;
 
 import com.sesac.fmmall.Constant.UserRole;
 import com.sesac.fmmall.DTO.User.UserResponseDto;
 import com.sesac.fmmall.DTO.User.UserSaveRequestDto;
+import com.sesac.fmmall.DTO.User.UserUpdateRequestDto;
 import com.sesac.fmmall.Entity.User;
 import com.sesac.fmmall.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +39,35 @@ public class UserService {
         }
 
         return user;
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponseDto getUserInfo(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        return new UserResponseDto(user);
+    }
+
+    public UserResponseDto updateUser(Integer userId, UserUpdateRequestDto dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        if (dto.getUserName() != null) {
+            user = User.builder()
+                    .userId(user.getUserId())
+                    .loginId(user.getLoginId())
+                    .password(user.getPassword())
+                    .userName(dto.getUserName())
+                    .userPhone(dto.getUserPhone() != null ? dto.getUserPhone() : user.getUserPhone())
+                    .createdAt(user.getCreatedAt())
+                    .role(user.getRole())
+                    .build();
+        }
+
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            user.encodePassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        return new UserResponseDto(userRepository.save(user));
     }
 }
