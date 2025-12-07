@@ -13,9 +13,10 @@ public interface RefundRepository extends JpaRepository<Refund, Integer> {
 
 
     List<Refund> findByOrder(Order order);
-    List<Refund> findByOrder_Id(Integer orderId);
+    //List<Refund> findByOrder_Id(Integer orderId);
+
 
 
     List<Refund> findByPayment(Payment payment);
-    List<Refund> findByPayment_Id(Integer paymentId);
+    //List<Refund> findByPayment_Id(Integer paymentId);
 }
