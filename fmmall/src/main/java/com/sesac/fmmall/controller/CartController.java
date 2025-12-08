@@ -1,5 +1,6 @@
 package com.sesac.fmmall.controller;
 
+import com.sesac.fmmall.Service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,5 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/Cart")
 @RequiredArgsConstructor
 public class CartController {
+
+    private final CartService cartService;
+
 
 }
