@@ -37,16 +37,16 @@ public class InquiryAnswerController {
 //        return ResponseEntity.ok(resultInquiryAnswer);
 //    }
     /* 2. 최신순 정렬(페이징) -> 유저, 문의 */
-    @GetMapping("/findAll/user/{userId}")
-    public ResponseEntity<Page<InquiryAnswerResponseDTO>> findInquiryAnswerByUserIdSortedUpdatedAt(@PathVariable int userId, Pageable pageable) {
-        Page<InquiryAnswerResponseDTO> resultInquiryAnswer = inquiryAnswerService.findInquiryAnswerByUserIdSortedUpdatedAt(userId, pageable);
+    @GetMapping("/findAll/user/{userId}/{curPage}")
+    public ResponseEntity<Page<InquiryAnswerResponseDTO>> findInquiryAnswerByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
+        Page<InquiryAnswerResponseDTO> resultInquiryAnswer = inquiryAnswerService.findInquiryAnswerByUserIdSortedUpdatedAt(userId, curPage);
         // 상태 코드 200(ok)와 함께 JSON 반환
         return ResponseEntity.ok(resultInquiryAnswer);
     }
 
-    @GetMapping("/findAll/inquiry/{inquiryId}")
-    public ResponseEntity<Page<InquiryAnswerResponseDTO>> findInquiryAnswerByInquiryIdSortedUpdatedAt(@PathVariable int inquiryId, Pageable pageable) {
-        Page<InquiryAnswerResponseDTO> resultInquiryAnswer = inquiryAnswerService.findInquiryAnswerByInquiryIdSortedUpdatedAt(inquiryId, pageable);
+    @GetMapping("/findAll/inquiry/{inquiryId}/{curPage}")
+    public ResponseEntity<Page<InquiryAnswerResponseDTO>> findInquiryAnswerByInquiryIdSortedUpdatedAt(@PathVariable int inquiryId, @PathVariable int curPage) {
+        Page<InquiryAnswerResponseDTO> resultInquiryAnswer = inquiryAnswerService.findInquiryAnswerByInquiryIdSortedUpdatedAt(inquiryId, curPage);
         // 상태 코드 200(ok)와 함께 JSON 반환
         return ResponseEntity.ok(resultInquiryAnswer);
     }

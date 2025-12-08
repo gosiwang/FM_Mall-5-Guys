@@ -48,14 +48,14 @@ public class InquiryService {
 //    }
 
     /* 2. 문의 최신순 상세 조회(유저, 상품별) */
-    public Page<InquiryResponseDTO> findInquiryByUserIdSortedUpdatedAt(int userId, Pageable pageable) {
+    public Page<InquiryResponseDTO> findInquiryByUserIdSortedUpdatedAt(int userId, int curPage) {
 
         if (!userRepository.existsById(userId)) {
             throw new IllegalArgumentException("존재하지 않는 유저입니다.");
         }
 
         // 2. 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
-        int page = pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1;
+        int page = curPage <= 0 ? 0 : curPage - 1;
         int size = 10;   // 문의는 한 페이지에 10개씩만
         String sortDir = "updatedAt";
 
@@ -69,14 +69,14 @@ public class InquiryService {
         return inquiryList.map(InquiryResponseDTO::from);
     }
 
-    public Page<InquiryResponseDTO> findInquiryByProductIdSortedUpdatedAt(int productId, Pageable pageable) {
+    public Page<InquiryResponseDTO> findInquiryByProductIdSortedUpdatedAt(int productId, int curPage) {
 
         if (!productRepository.existsById(productId)) {
             throw new IllegalArgumentException("존재하지 않는 상품입니다.");
         }
 
         // 2. 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
-        int page = pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1;
+        int page = curPage <= 0 ? 0 : curPage - 1;
         int size = 10;   // 문의는 한 페이지에 10개씩만
         String sortDir = "updatedAt";
 
