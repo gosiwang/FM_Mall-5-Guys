@@ -1,4 +1,4 @@
-package com.sesac.fmmall.config;
+package com.sesac.fmmall.Config;
 
 import com.sesac.fmmall.security.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;

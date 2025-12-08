@@ -1,13 +1,13 @@
 HELP.md
 
-### Gradle ###
+Gradle
 fmmall/.gradle/
 fmmall/build/
 !fmmall/gradle/wrapper/gradle-wrapper.jar
-!fmmall/**/src/main/**/build/
-!fmmall/**/src/test/**/build/
+!fmmall//src/main//build/
+!fmmall//src/test//build/
 
-### STS ###
+STS
 fmmall/.apt_generated
 fmmall/.classpath
 fmmall/.factorypath
@@ -16,36 +16,36 @@ fmmall/.settings
 fmmall/.springBeans
 fmmall/.sts4-cache
 fmmall/bin/
-!fmmall/**/src/main/**/bin/
-!fmmall/**/src/test/**/bin/
+!fmmall//src/main//bin/
+!fmmall//src/test//bin/
 
-### IntelliJ IDEA ###
+IntelliJ IDEA
 fmmall/.idea/
-fmmall/*.iws
-fmmall/*.iml
-fmmall/*.ipr
+fmmall/.iws
+fmmall/.iml
+fmmall/.ipr
 fmmall/out/
-!fmmall/**/src/main/**/out/
-!fmmall/**/src/test/**/out/
+!fmmall//src/main//out/
+!fmmall//src/test//out/
 
-### NetBeans ###
+NetBeans
 fmmall/nbproject/private/
 fmmall/nbbuild/
 fmmall/dist/
 fmmall/nbdist/
 fmmall/.nb-gradle/
 
-### VS Code ###
+VS Code
 fmmall/.vscode/
 
-### OS / Editor ###
+OS / Editor
 .DS_Store
 Thumbs.db
 
-### Local config (yml 외부 유출 방지) ###
+Local config (yml 외부 유출 방지)
 fmmall/src/main/resources/application.yml
 fmmall/src/main/resources/application-local.yml
-fmmall/src/main/resources/application-*.yml
+fmmall/src/main/resources/application-.yml
 
 fmmall/src/test/resources/application.yml
 fmmall/src/test/resources/application-local.yml
