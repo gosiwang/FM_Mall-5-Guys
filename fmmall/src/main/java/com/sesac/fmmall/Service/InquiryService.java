@@ -54,7 +54,7 @@ public class InquiryService {
 
     /* 3. 문의 등록 */
     @Transactional
-    public InquiryResponseDTO registInquiry(InquiryRequestDTO requestDTO) {
+    public InquiryResponseDTO insertInquiry(InquiryRequestDTO requestDTO) {
         User user = userRepository.findById(requestDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         Product product = productRepository.findById(requestDTO.getProductId())
