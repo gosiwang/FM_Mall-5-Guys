@@ -63,8 +63,8 @@ public class JwtTokenProvider {
     }
 
 
-    public Long getUserId(String token) {
-        return parseClaims(token).get("userId", Long.class);
+    public int getUserId(String token) {
+        return parseClaims(token).get("userId", Integer.class);
     }
 
     public String getRole(String token) {
