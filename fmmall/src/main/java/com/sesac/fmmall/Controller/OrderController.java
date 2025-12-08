@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/Order")
 @RequiredArgsConstructor
-public class OrderController {
+public class OrderController extends BaseController {
 
     private final OrderService orderService;
 
@@ -25,10 +25,9 @@ public class OrderController {
      */
     @PostMapping("/insert")
     public ResponseEntity<OrderResponse> insertOrder(
-            @AuthenticationPrincipal(expression = "userId") Integer userId,
             @RequestBody OrderCreateRequest request
     ) {
-        OrderResponse response = orderService.createOrder(userId, request);
+        OrderResponse response = orderService.createOrder(getCurrentUserId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -38,9 +37,9 @@ public class OrderController {
      */
     @GetMapping("/findAll")
     public ResponseEntity<List<OrderSummaryResponse>> findAllByUser(
-            @AuthenticationPrincipal(expression = "userId") Integer userId
+
     ) {
-        List<OrderSummaryResponse> responses = orderService.getOrdersByUser(userId);
+        List<OrderSummaryResponse> responses = orderService.getOrdersByUser(getCurrentUserId());
         return ResponseEntity.ok(responses);
     }
 
@@ -50,10 +49,10 @@ public class OrderController {
      */
     @GetMapping("/findOne/{orderId}")
     public ResponseEntity<OrderResponse> findOne(
-            @PathVariable Integer orderId,
-            @AuthenticationPrincipal(expression = "userId") Integer userId
+            @PathVariable Integer orderId
+
     ) {
-        OrderResponse response = orderService.getOrderDetail(orderId, userId);
+        OrderResponse response = orderService.getOrderDetail(orderId, getCurrentUserId());
         return ResponseEntity.ok(response);
     }
 
@@ -63,10 +62,10 @@ public class OrderController {
      */
     @GetMapping("/findByProduct/{productId}")
     public ResponseEntity<List<OrderResponse>> findByProduct(
-            @PathVariable Integer productId,
-            @AuthenticationPrincipal(expression = "userId") Integer userId
+            @PathVariable Integer productId
+
     ) {
-        List<OrderResponse> responses = orderService.getOrdersByUserAndProduct(userId, productId);
+        List<OrderResponse> responses = orderService.getOrdersByUserAndProduct(getCurrentUserId(), productId);
         return ResponseEntity.ok(responses);
     }
 
@@ -76,10 +75,10 @@ public class OrderController {
      */
     @PutMapping("/cancel/{orderId}")
     public ResponseEntity<Void> cancelOrder(
-            @PathVariable Integer orderId,
-            @AuthenticationPrincipal(expression = "userId") Integer userId
+            @PathVariable Integer orderId
+
     ) {
-        orderService.cancelOrder(orderId, userId);
+        orderService.cancelOrder(orderId, getCurrentUserId());
         return ResponseEntity.noContent().build();
     }
 }
