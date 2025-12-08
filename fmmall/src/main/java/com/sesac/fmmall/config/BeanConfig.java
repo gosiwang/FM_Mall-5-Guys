@@ -17,6 +17,7 @@ public class BeanConfig {
                 .setFieldAccessLevel(
                         org.modelmapper.config.Configuration.AccessLevel.PRIVATE
                 )
+                .setFieldMatchingEnabled(true);
                 .setFieldMatchingEnabled(true)
                 // 🔹 여러 경로가 보여도(ambiguous) 예외 던지지 말고 그냥 무시해
                 .setAmbiguityIgnored(true);
