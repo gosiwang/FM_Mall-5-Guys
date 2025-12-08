@@ -13,9 +13,9 @@ public interface RefundItemRepository extends JpaRepository<RefundItem, Integer>
 
 
     List<RefundItem> findByRefund(Refund refund);
-    //List<RefundItem> findByRefund_Id(Integer refundId);
+    List<RefundItem> findByRefund_Id(Integer refundId);
 
 
     List<RefundItem> findByOrderItem(OrderItem orderItem);
-   // List<RefundItem> findByOrderItem_Id(Integer orderItemId);
+    List<RefundItem> findByOrderItem_Id(Integer orderItemId);
 }

@@ -14,5 +14,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     Optional<Payment> findByOrder(Order order);
 
 
-    //Optional<Payment> findByOrder_Id(Integer orderId);
+    Optional<Payment> findByOrder_Id(Integer orderId);
 }

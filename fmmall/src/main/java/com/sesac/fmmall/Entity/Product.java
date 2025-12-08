@@ -65,24 +65,4 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "row_category_id")
     private RowCategory rowCategory;
-
-    public void modify(
-            Category newCategory,
-            RowCategory newRowCategory,
-            Brand newBrand,
-            String newProductName,
-            int newPrice,
-            String newDescription,
-            String newIsInstallationRequired,
-            ProductStatus newStatus
-    ) {
-        this.category = newCategory;
-        this.rowCategory = newRowCategory;
-        this.brand = newBrand;
-        this.name = newProductName;
-        this.price = newPrice;
-        this.description = newDescription;
-        this.isInstallationRequired = newIsInstallationRequired;
-        this.productStatus = newStatus;
-    }
 }

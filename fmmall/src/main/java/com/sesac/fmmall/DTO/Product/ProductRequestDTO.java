@@ -22,13 +22,4 @@ public class ProductRequestDTO {
     private String isInstallationRequired;
     private int brandId;
     private int categoryId;
-    private int rowCategoryId;
-
-    public Integer getRowCategoryCode() {
-        return this.rowCategoryId;
-    }
-
-    public Integer getCategoryCode() {
-        return this.categoryId;
-    }
 }

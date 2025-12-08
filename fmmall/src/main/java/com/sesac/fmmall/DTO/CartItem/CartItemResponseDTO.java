@@ -16,7 +16,7 @@ public class CartItemResponseDTO {
     private String productName;
     private int productPrice;
     private String productImage;
-    private int cartItemQuantity;
+    private int quantity;
     private int totalPrice;
     private String checkStatus;
     private LocalDateTime addDate;

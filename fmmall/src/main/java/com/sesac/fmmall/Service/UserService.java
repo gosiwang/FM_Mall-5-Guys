@@ -1,5 +1,6 @@
 package com.sesac.fmmall.Service;
 
+import com.sesac.fmmall.Constant.UserRole;
 import com.sesac.fmmall.DTO.User.UserResponseDto;
 import com.sesac.fmmall.DTO.User.UserSaveRequestDto;
 import com.sesac.fmmall.DTO.User.UserUpdateRequestDto;
