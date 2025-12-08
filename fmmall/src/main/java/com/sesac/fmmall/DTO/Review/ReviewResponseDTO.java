@@ -1,10 +1,8 @@
 package com.sesac.fmmall.DTO.Review;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.sesac.fmmall.Entity.Review;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ReviewResponseDTO {
     private int reviewId;
     private Double reviewRating;
@@ -23,4 +23,17 @@ public class ReviewResponseDTO {
 
     private int userId;
     private int orderItemId;
+
+    public static ReviewResponseDTO from(Review review) {
+        return ReviewResponseDTO.builder()
+                .reviewId(review.getReviewId())
+                .reviewRating(review.getReviewRating())
+                .reviewContent(review.getReviewContent())
+                .createdAt(review.getCreatedAt())
+                .updatedAt(review.getUpdatedAt())
+                .userId(review.getUser().getUserId())
+                .orderItemId(review.getOrderItem().getId())
+                .build();
+
+    }
 }
