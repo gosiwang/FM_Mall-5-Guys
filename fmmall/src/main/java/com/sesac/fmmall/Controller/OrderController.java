@@ -1,5 +1,6 @@
 package com.sesac.fmmall.Controller;
 
+import com.sesac.fmmall.DTO.Order.CartOrderCreateRequest;
 import com.sesac.fmmall.DTO.Order.OrderCreateRequest;
 import com.sesac.fmmall.DTO.Order.OrderResponse;
 import com.sesac.fmmall.DTO.Order.OrderSummaryResponse;
@@ -28,6 +29,14 @@ public class OrderController extends BaseController {
             @RequestBody OrderCreateRequest request
     ) {
         OrderResponse response = orderService.createOrder(getCurrentUserId(), request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/insertFromCart")
+    public ResponseEntity<OrderResponse> insertOrderFromCart(
+            @RequestBody CartOrderCreateRequest request
+    ) {
+        OrderResponse response = orderService.createOrderFromCart(getCurrentUserId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
