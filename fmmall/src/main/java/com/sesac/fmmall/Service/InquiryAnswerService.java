@@ -30,7 +30,7 @@ public class InquiryAnswerService {
     private final ModelMapper modelMapper;
 
     /* 1. 문의 답변 코드로 상세 조회 */
-    public InquiryAnswerResponseDTO findInquiryByInquiryId(int inquiryAnswerId) {
+    public InquiryAnswerResponseDTO findInquiryAnswerByInquiryAnswerId(int inquiryAnswerId) {
         InquiryAnswer foundInquiryAnswer = inquiryAnswerRepository.findById(inquiryAnswerId).orElseThrow(
                 () -> new IllegalArgumentException("해당 ID를 가진 문의 답변이 존재하지 않습니다."));
 
@@ -53,7 +53,7 @@ public class InquiryAnswerService {
 
     /* 3. 문의 답변 등록 */
     @Transactional
-    public InquiryAnswerResponseDTO registInquiryAnswer(InquiryAnswerRequestDTO requestDTO) {
+    public InquiryAnswerResponseDTO insertInquiryAnswer(InquiryAnswerRequestDTO requestDTO) {
         User user = userRepository.findById(requestDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         Inquiry inquiry = inquiryRepository.findById(requestDTO.getInquiryId())

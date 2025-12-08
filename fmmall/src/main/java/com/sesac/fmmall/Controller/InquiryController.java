@@ -3,6 +3,7 @@ package com.sesac.fmmall.Controller;
 import com.sesac.fmmall.DTO.Inquiry.InquiryRequestDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryResponseDTO;
 import com.sesac.fmmall.Service.InquiryService;
+import com.sesac.fmmall.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class InquiryController {
 
     private final InquiryService inquiryService;
+    private final UserService userService;
 
     /* 1. 특정 아이디로 조회 */
     @GetMapping("/find/{inquiryId}")
@@ -35,8 +37,8 @@ public class InquiryController {
 
     /* 3. 문의 등록 */
     @PostMapping("/insert")
-    public ResponseEntity<InquiryResponseDTO> registInquiry(@RequestBody InquiryRequestDTO requestDTO) {
-        InquiryResponseDTO newInquiry = inquiryService.registInquiry(requestDTO);
+    public ResponseEntity<InquiryResponseDTO> insertInquiry(@RequestBody InquiryRequestDTO requestDTO) {
+        InquiryResponseDTO newInquiry = inquiryService.insertInquiry(requestDTO);
         // 신규 리소스 생성 시 201 Created 상태 코드 반환
         return ResponseEntity.status(HttpStatus.CREATED).body(newInquiry);
     }
@@ -51,7 +53,7 @@ public class InquiryController {
 
     /* 5. 문의 삭제 */
     @DeleteMapping("/delete/{inquiryId} ")
-    public ResponseEntity<Void> deleteinquiry(@PathVariable int inquiryId) {
+    public ResponseEntity<Void> deleteInquiry(@PathVariable int inquiryId) {
 
         inquiryService.deleteInquiry(inquiryId);
 
