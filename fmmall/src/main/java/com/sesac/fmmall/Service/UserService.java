@@ -70,4 +70,21 @@ public class UserService {
 
         return new UserResponseDto(userRepository.save(user));
     }
+
+    @Transactional
+    public void deleteUser(Integer userId, String password) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+     /*   List<Order> orders = orderRepository.findByUser_UserId(userId);
+        if (!orders.isEmpty()) {
+            throw new IllegalStateException("주문 내역이 있는 경우 탈퇴할 수 없습니다. 고객센터에 문의해주세요.");
+        }*/
+
+        userRepository.delete(user);
+    }
 }

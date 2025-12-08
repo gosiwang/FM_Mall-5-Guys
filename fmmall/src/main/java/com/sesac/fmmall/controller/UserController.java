@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/User")
 @RequiredArgsConstructor
@@ -47,6 +50,23 @@ public class UserController {
             @PathVariable Integer userId,
             @RequestBody UserUpdateRequestDto dto) {
         UserResponseDto response = userService.updateUser(userId, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<Map<String, String>> deleteUser(
+            @PathVariable Integer userId,
+            @RequestBody Map<String, String> request) {
+
+        String password = request.get("password");
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("비밀번호를 입력해주세요.");
+        }
+
+        userService.deleteUser(userId, password);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "회원탈퇴가 완료되었습니다.");
         return ResponseEntity.ok(response);
     }
 }
