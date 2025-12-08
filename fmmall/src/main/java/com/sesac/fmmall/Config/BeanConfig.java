@@ -13,17 +13,13 @@ public class BeanConfig {
     public ModelMapper modelMapper() {
 
         ModelMapper modelMapper = new ModelMapper();
+
         modelMapper.getConfiguration()
-                .setFieldAccessLevel(
-                        org.modelmapper.config.Configuration.AccessLevel.PRIVATE
-                )
-                .setFieldMatchingEnabled(true);
+                .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
                 .setFieldMatchingEnabled(true)
-                // 🔹 여러 경로가 보여도(ambiguous) 예외 던지지 말고 그냥 무시해
                 .setAmbiguityIgnored(true);
 
-        // 🔹 Order -> OrderResponse 매핑 시 userId는 자동 매핑하지 마
-        //    (우리가 Service에서 직접 dto.setUserId(...) 해줄 거라서)
+        // Order → OrderResponse 변환 시 userId 자동 매핑 금지
         modelMapper.typeMap(Order.class, OrderResponse.class)
                 .addMappings(mapper -> mapper.skip(OrderResponse::setUserId));
 
