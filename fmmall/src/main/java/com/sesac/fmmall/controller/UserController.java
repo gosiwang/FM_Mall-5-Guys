@@ -1,5 +1,3 @@
-// com.sesac.fmmall.Controller.AuthController
-
 package com.sesac.fmmall.controller;
 
 import com.sesac.fmmall.DTO.User.*;
@@ -12,9 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/User")
 @RequiredArgsConstructor
-public class AuthController {
+public class UserController {
 
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -35,6 +33,20 @@ public class AuthController {
                 user.getLoginId(),
                 user.getRole().name()
         );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/findOne/{userId}")
+    public ResponseEntity<UserResponseDto> findOne(@PathVariable Integer userId) {
+        UserResponseDto response = userService.getUserInfo(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/modify/{userId}")
+    public ResponseEntity<UserResponseDto> modify(
+            @PathVariable Integer userId,
+            @RequestBody UserUpdateRequestDto dto) {
+        UserResponseDto response = userService.updateUser(userId, dto);
         return ResponseEntity.ok(response);
     }
 }
