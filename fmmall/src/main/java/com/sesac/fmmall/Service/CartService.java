@@ -1,7 +1,8 @@
 package com.sesac.fmmall.Service;
 
-import com.sesac.fmmall.DTO.CartItem.CartItemRequestDTO;
+import com.sesac.fmmall.DTO.CartItem.CartItemCreateRequestDTO;
 import com.sesac.fmmall.DTO.CartItem.CartItemResponseDTO;
+import com.sesac.fmmall.DTO.CartItem.CartItemUpdateRequestDTO;
 import com.sesac.fmmall.DTO.CartResponseDTO;
 import com.sesac.fmmall.Entity.Cart;
 import com.sesac.fmmall.Entity.CartItem;
@@ -33,7 +34,7 @@ public class CartService {
     private final ModelMapper modelMapper;
 
     @Transactional
-    public CartResponseDTO createCartItem(int userId, CartItemRequestDTO requestDTO) {
+    public CartResponseDTO createCartItem(int userId, CartItemCreateRequestDTO requestDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         Product product = productRepository.findById(requestDTO.getProductId())
@@ -49,7 +50,7 @@ public class CartService {
     }
 
     @Transactional
-    public CartResponseDTO updateCartItemQuantity(int userId, int cartItemId, CartItemRequestDTO requestDTO) {
+    public CartResponseDTO updateCartItemQuantity(int userId, int cartItemId, CartItemUpdateRequestDTO requestDTO) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 상품을 찾을 수 없습니다."));
 
@@ -92,7 +93,7 @@ public class CartService {
                     cartItemResponseDTO.setProductId(product.getProductId());
                     cartItemResponseDTO.setProductName(product.getName());
                     cartItemResponseDTO.setProductPrice(product.getPrice());
-                    cartItemResponseDTO.setTotalPrice(product.getPrice() * cartItem.getQuantity());
+                    cartItemResponseDTO.setTotalPrice(product.getPrice() * cartItem.getCartItemQuantity());
 
                     return cartItemResponseDTO;
                 })

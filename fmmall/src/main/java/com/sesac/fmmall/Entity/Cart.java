@@ -43,13 +43,13 @@ public class Cart {
                 .orElse(null);
 
         if (existingItem != null) {
-            int totalQuantity = existingItem.getQuantity() + newCartItem.getQuantity();
+            int totalQuantity = existingItem.getCartItemQuantity() + newCartItem.getCartItemQuantity();
             if (totalQuantity > stock) {
                 throw new IllegalArgumentException("상품의 재고가 부족합니다.");
             }
             existingItem.updateQuantity(totalQuantity, this.user.getUserId());
         } else {
-            if (newCartItem.getQuantity() > stock) {
+            if (newCartItem.getCartItemQuantity() > stock) {
                 throw new IllegalArgumentException("상품의 재고가 부족합니다.");
             }
             cartItems.add(newCartItem);

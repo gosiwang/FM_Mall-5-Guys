@@ -18,7 +18,8 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cartItemId;
 
-    private int quantity;
+    @Column(name = "cart_item_quantity")
+    private int cartItemQuantity = 1;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -47,7 +48,7 @@ public class CartItem {
         }
         CartItem cartItem = new CartItem();
         cartItem.product = product;
-        cartItem.quantity = quantity;
+        cartItem.cartItemQuantity = quantity;
         cartItem.checkStatus = "N";
         return cartItem;
     }
@@ -64,7 +65,7 @@ public class CartItem {
             throw new IllegalArgumentException("상품의 재고가 부족합니다.");
         }
 
-        this.quantity = newQuantity;
+        this.cartItemQuantity = newQuantity;
     }
 
     public void updateCheckStatus(String checkStatus) {

@@ -1,6 +1,7 @@
 package com.sesac.fmmall.controller;
 
-import com.sesac.fmmall.DTO.CartItem.CartItemRequestDTO;
+import com.sesac.fmmall.DTO.CartItem.CartItemCreateRequestDTO;
+import com.sesac.fmmall.DTO.CartItem.CartItemUpdateRequestDTO;
 import com.sesac.fmmall.DTO.CartResponseDTO;
 import com.sesac.fmmall.Service.CartService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class CartController {
     @PostMapping("/insert/{userId}")
     public ResponseEntity<CartResponseDTO> addCartItem(
             @PathVariable int userId,
-            @RequestBody CartItemRequestDTO requestDTO
+            @RequestBody CartItemCreateRequestDTO requestDTO
     ) {
         CartResponseDTO response = cartService.createCartItem(userId, requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -30,7 +31,7 @@ public class CartController {
     public ResponseEntity<CartResponseDTO> modifyCartItem(
             @PathVariable int userId,
             @PathVariable int cartItemId,
-            @RequestBody CartItemRequestDTO requestDTO
+            @RequestBody CartItemUpdateRequestDTO requestDTO
     ) {
         CartResponseDTO response = cartService.updateCartItemQuantity(userId, cartItemId, requestDTO);
         return ResponseEntity.ok(response);
