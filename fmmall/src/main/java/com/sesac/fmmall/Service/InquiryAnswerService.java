@@ -35,7 +35,7 @@ public class InquiryAnswerService {
                 () -> new IllegalArgumentException("해당 ID를 가진 문의 답변이 존재하지 않습니다."));
 
 //        return new InquiryResponseDTO(foundInquiry);
-        return modelMapper.map(foundInquiryAnswer, InquiryAnswerResponseDTO.class);
+        return InquiryAnswerResponseDTO.from(foundInquiryAnswer);
     }
     /* 2. 문의 답변 최신순 상세 조회 */
     public Page<InquiryAnswerResponseDTO> findAllSortedUpdatedAt(Pageable pageable) {
@@ -47,7 +47,7 @@ public class InquiryAnswerService {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
         Page<InquiryAnswer> InquiryAnswerList = inquiryAnswerRepository.findAllByOrderByUpdatedAtDesc(pageRequest);
 //        return InquiryList.map(InquiryResponseDTO::new);
-        return InquiryAnswerList.map(inquiryAnswer -> modelMapper.map(inquiryAnswer, InquiryAnswerResponseDTO.class));
+        return InquiryAnswerList.map(InquiryAnswerResponseDTO::from);
 //        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
     }
 
@@ -71,15 +71,15 @@ public class InquiryAnswerService {
 
         // 저장 후, 생성된 Entity를 다시 DTO로 변환하여 반환
 
-//        return InquiryAnswerResponseDTO.from(savedInquiryAnswer);
+        return InquiryAnswerResponseDTO.from(savedInquiryAnswer);
 
-        return InquiryAnswerResponseDTO.builder()
-                .userId(savedInquiryAnswer.getUser().getUserId())       // user.getUserId()로 해도 되지만, 그냥 안전하게 save한 걸로 받아옴.
-                .inquiryId(savedInquiryAnswer.getInquiry().getInquiryId())
-                .inquiryAnswerContent(savedInquiryAnswer.getInquiryAnswerContent())
-                .createdAt(savedInquiryAnswer.getCreatedAt())
-                .updatedAt(savedInquiryAnswer.getUpdatedAt())
-                .build();
+//            return InquiryAnswerResponseDTO.builder()
+//                    .userId(savedInquiryAnswer.getUser().getUserId())       // user.getUserId()로 해도 되지만, 그냥 안전하게 save한 걸로 받아옴.
+//                    .inquiryId(savedInquiryAnswer.getInquiry().getInquiryId())
+//                    .inquiryAnswerContent(savedInquiryAnswer.getInquiryAnswerContent())
+//                    .createdAt(savedInquiryAnswer.getCreatedAt())
+//                    .updatedAt(savedInquiryAnswer.getUpdatedAt())
+//                    .build();
 
 //        return modelMapper.map(savedInquiryAnswer, InquiryAnswerResponseDTO.class);
 //        return new InquiryResponseDTO(savedInquiry);
@@ -96,7 +96,8 @@ public class InquiryAnswerService {
             requestDTO.getInquiryAnswerContent()
         );
 
-        return modelMapper.map(foundInquiryAnswer, InquiryAnswerResponseDTO.class);
+        return InquiryAnswerResponseDTO.from(foundInquiryAnswer);
+//        return modelMapper.map(foundInquiryAnswer, InquiryAnswerResponseDTO.class);
 //        return new InquiryResponseDTO(foundInquiry);
     }
 

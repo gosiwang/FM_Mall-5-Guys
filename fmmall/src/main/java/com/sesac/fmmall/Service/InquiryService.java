@@ -1,5 +1,7 @@
 package com.sesac.fmmall.Service;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sesac.fmmall.DTO.Inquiry.InquiryAnswerResponseDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryRequestDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryResponseDTO;
 import com.sesac.fmmall.Entity.Inquiry;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +36,7 @@ public class InquiryService {
                 () -> new IllegalArgumentException("해당 ID를 가진 문의가 존재하지 않습니다."));
 
 //        return new InquiryResponseDTO(foundInquiry);
-        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
+        return InquiryResponseDTO.from(foundInquiry);
     }
     /* 2. 문의 최신순 상세 조회 */
     public Page<InquiryResponseDTO> findAllSortedUpdatedAt(Pageable pageable) {
@@ -45,7 +48,7 @@ public class InquiryService {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
         Page<Inquiry> InquiryList = inquiryRepository.findAllByOrderByUpdatedAtDesc(pageRequest);
 //        return InquiryList.map(InquiryResponseDTO::new);
-        return InquiryList.map(inquiry -> modelMapper.map(inquiry, InquiryResponseDTO.class));
+        return InquiryList.map(InquiryResponseDTO::from);
 //        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
     }
 
@@ -68,7 +71,8 @@ public class InquiryService {
         Inquiry savedInquiry = inquiryRepository.save(newInquiry);
 
         // 저장 후, 생성된 Entity를 다시 DTO로 변환하여 반환
-        return modelMapper.map(savedInquiry, InquiryResponseDTO.class);
+        return InquiryResponseDTO.from(savedInquiry);
+//        return modelMapper.map(savedInquiry, InquiryResponseDTO.class);
 //        return new InquiryResponseDTO(savedInquiry);
     }
 
@@ -83,7 +87,8 @@ public class InquiryService {
             requestDTO.getInquiryContent()
         );
 
-        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
+        return InquiryResponseDTO.from(foundInquiry);
+//        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
 //        return new InquiryResponseDTO(foundInquiry);
     }
 

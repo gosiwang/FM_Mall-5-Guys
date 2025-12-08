@@ -2,10 +2,7 @@ package com.sesac.fmmall.DTO.Inquiry;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sesac.fmmall.Entity.Inquiry;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class InquiryResponseDTO {
     private int inquiryId;
     private String inquiryContent;
@@ -23,6 +22,18 @@ public class InquiryResponseDTO {
 
     private int userId;
     private int productId;
+
+    public static InquiryResponseDTO from(Inquiry inquiry) {
+        return InquiryResponseDTO.builder()
+                .inquiryId(inquiry.getInquiryId())
+                .inquiryContent(inquiry.getInquiryContent())
+
+                .createdAt(inquiry.getCreatedAt())
+                .updatedAt(inquiry.getUpdatedAt())
+                .userId(inquiry.getUser().getUserId())
+                .productId(inquiry.getProduct().getProductId())
+                .build();
+    }
 
 //    public InquiryResponseDTO(Inquiry inquiry) {
 //        this.inquiryId = inquiry.getInquiryId();

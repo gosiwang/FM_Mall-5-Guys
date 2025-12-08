@@ -24,4 +24,17 @@ public class InquiryAnswerResponseDTO {
     private int userId;
     private int inquiryId;
 
+
+    public static InquiryAnswerResponseDTO from(InquiryAnswer inquiryAnswer) {
+        return InquiryAnswerResponseDTO.builder()
+                .inquiryAnswerId(inquiryAnswer.getInquiryAnswerId())
+                .inquiryAnswerContent(inquiryAnswer.getInquiryAnswerContent())
+
+                .createdAt(inquiryAnswer.getCreatedAt())
+                .updatedAt(inquiryAnswer.getUpdatedAt())
+                .userId(inquiryAnswer.getUser().getUserId())
+                .inquiryId(inquiryAnswer.getInquiry().getInquiryId())
+                .build();
+    }
+
 }
