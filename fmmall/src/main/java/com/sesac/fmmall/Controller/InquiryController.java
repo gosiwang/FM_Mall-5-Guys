@@ -1,8 +1,7 @@
-package com.sesac.fmmall.controller;
+package com.sesac.fmmall.Controller;
 
 import com.sesac.fmmall.DTO.Inquiry.InquiryRequestDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryResponseDTO;
-import com.sesac.fmmall.Repository.InquiryRepository;
 import com.sesac.fmmall.Service.InquiryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

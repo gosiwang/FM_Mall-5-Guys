@@ -1,4 +1,4 @@
-package com.sesac.fmmall.config;
+package com.sesac.fmmall.Config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

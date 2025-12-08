@@ -1,9 +1,9 @@
-package com.sesac.fmmall.controller;
+package com.sesac.fmmall.Controller;
 
 import com.sesac.fmmall.DTO.User.*;
 import com.sesac.fmmall.Entity.User;
 import com.sesac.fmmall.Service.UserService;
-import com.sesac.fmmall.security.JwtTokenProvider;
+import com.sesac.fmmall.Security.JwtTokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +49,7 @@ public class UserController {
     public ResponseEntity<UserResponseDto> modify(
             @PathVariable Integer userId,
             @RequestBody UserUpdateRequestDto dto) {
+
         UserResponseDto response = userService.updateUser(userId, dto);
         return ResponseEntity.ok(response);
     }

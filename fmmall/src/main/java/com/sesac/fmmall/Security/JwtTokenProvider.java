@@ -1,4 +1,4 @@
-package com.sesac.fmmall.security;
+package com.sesac.fmmall.Security;
 
 import com.sesac.fmmall.Entity.User;
 import io.jsonwebtoken.*;

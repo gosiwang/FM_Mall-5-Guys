@@ -1,4 +1,4 @@
-package com.sesac.fmmall.controller;
+package com.sesac.fmmall.Controller;
 
 import com.sesac.fmmall.DTO.Refund.RefundCreateRequest;
 import com.sesac.fmmall.DTO.Refund.RefundResponse;

@@ -11,7 +11,7 @@ import com.sesac.fmmall.Repository.BrandRepository;
 import com.sesac.fmmall.Repository.CategoryRepository;
 import com.sesac.fmmall.Repository.ProductRepository;
 import com.sesac.fmmall.Repository.RowCategoryRepository;
-import com.sesac.fmmall.security.JwtAuthorizationFilter;
+import com.sesac.fmmall.Security.JwtAuthorizationFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;

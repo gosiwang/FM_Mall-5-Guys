@@ -1,6 +1,6 @@
 // com.sesac.fmmall.security.JwtAuthorizationFilter
 
-package com.sesac.fmmall.security;
+package com.sesac.fmmall.Security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

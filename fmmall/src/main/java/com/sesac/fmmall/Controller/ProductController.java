@@ -1,8 +1,7 @@
-package com.sesac.fmmall.controller;
+package com.sesac.fmmall.Controller;
 
 import com.sesac.fmmall.DTO.Product.ProductRequestDTO;
 import com.sesac.fmmall.DTO.Product.ProductResponseDTO;
-import com.sesac.fmmall.Entity.Product;
 import com.sesac.fmmall.Service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,6 @@
-package com.sesac.fmmall.config;
+package com.sesac.fmmall.Config;
 
-import com.sesac.fmmall.security.JwtAuthorizationFilter;
+import com.sesac.fmmall.Security.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
