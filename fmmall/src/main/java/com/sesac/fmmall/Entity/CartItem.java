@@ -68,8 +68,16 @@ public class CartItem {
         this.cartItemQuantity = newQuantity;
     }
 
-    public void updateCheckStatus(String checkStatus) {
-        this.checkStatus = checkStatus;
+    public void updateCheckStatus(String newCheckStatus, int requesterUserId) {
+        if (this.getCart().getUser().getUserId() != requesterUserId) {
+            throw new IllegalStateException("다른 사용자의 장바구니 상품을 수정할 권한이 없습니다.");
+        }
+
+        if (!"Y".equals(newCheckStatus) && !"N".equals(newCheckStatus)) {
+            throw new IllegalArgumentException("checkStatus는 'Y' 또는 'N' 이어야 합니다.");
+        }
+
+        this.checkStatus = newCheckStatus;
     }
 
     public void associateWithCart(Cart cart) {
