@@ -12,23 +12,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/inquiries")
+@RequestMapping("/Inquiry")
 @RequiredArgsConstructor
 public class InquiryController {
 
-    private final InquiryRepository inquiryRepository;
     private final InquiryService inquiryService;
 
     /* 1. 특정 아이디로 조회 */
-    @GetMapping("/{inquiryId}")
+    @GetMapping("/find/{inquiryId}")
     public ResponseEntity<InquiryResponseDTO> findInquiryById(@PathVariable int inquiryId) {
         InquiryResponseDTO resultInquiry = inquiryService.findInquiryByInquiryId(inquiryId);
         // 상태 코드 200(ok)와 함께 JSON 반환
         return ResponseEntity.ok(resultInquiry);
     }
 
-    /* 2. 최신순 정렬(페이징) */
-    @GetMapping("/all")
+    /* 2. 최신순 정렬(페이징) -> 상품, 유저별로 변경해야함. */
+    @GetMapping("/findAll")
     public ResponseEntity<Page<InquiryResponseDTO>> findAllByOrderByUpdatedAt(Pageable pageable) {
         Page<InquiryResponseDTO> resultInquiry = inquiryService.findAllSortedUpdatedAt(pageable);
         // 상태 코드 200(ok)와 함께 JSON 반환
@@ -36,7 +35,7 @@ public class InquiryController {
     }
 
     /* 3. 문의 등록 */
-    @PostMapping
+    @PostMapping("/insert")
     public ResponseEntity<InquiryResponseDTO> registInquiry(@RequestBody InquiryRequestDTO requestDTO) {
         InquiryResponseDTO newInquiry = inquiryService.registInquiry(requestDTO);
         // 신규 리소스 생성 시 201 Created 상태 코드 반환
@@ -44,7 +43,7 @@ public class InquiryController {
     }
 
     /* 4. 문의 수정 */
-    @PutMapping("/{inquiryId}")
+    @PutMapping("/modify/{inquiryId}")
     public ResponseEntity<InquiryResponseDTO> modifyInquiry(@PathVariable int inquiryId, @RequestBody InquiryRequestDTO requestDTO) {
         InquiryResponseDTO updatedInquiry = inquiryService.modifyInquiryContent(inquiryId, requestDTO);
 //        신규 리소스 생성 시 201 CREATED 상태 코드 반환
@@ -52,7 +51,7 @@ public class InquiryController {
     }
 
     /* 5. 문의 삭제 */
-    @DeleteMapping("/{inquiryId}")
+    @DeleteMapping("/delete/{inquiryId} ")
     public ResponseEntity<Void> deleteinquiry(@PathVariable int inquiryId) {
 
         inquiryService.deleteInquiry(inquiryId);
