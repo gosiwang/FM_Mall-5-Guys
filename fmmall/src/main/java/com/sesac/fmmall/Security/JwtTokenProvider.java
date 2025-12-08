@@ -23,7 +23,6 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-
         this.secretKey = Keys.hmacShaKeyFor(secretKeyPlain.getBytes());
     }
 
@@ -34,6 +33,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(user.getLoginId())
                 .claim("role", user.getRole().name())
+                .claim("userId", user.getUserId())
                 .setIssuedAt(new Date(now))
                 .setExpiration(validity)
                 .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -42,31 +42,32 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token);
+            parseClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
-    public String getLoginId(String token) {
-        Claims claims = Jwts.parserBuilder()
+    private Claims parseClaims(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject();
+    }
+
+
+    public String getLoginId(String token) {
+        return parseClaims(token).getSubject();
+    }
+
+
+    public int getUserId(String token) {
+        return parseClaims(token).get("userId", Integer.class);
     }
 
     public String getRole(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return (String) claims.get("role");
+        return parseClaims(token).get("role", String.class);
     }
 }

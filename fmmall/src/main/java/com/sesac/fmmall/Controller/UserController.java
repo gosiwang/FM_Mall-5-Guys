@@ -15,7 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/User")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController extends BaseController {
 
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -42,6 +42,13 @@ public class UserController {
     @GetMapping("/findOne/{userId}")
     public ResponseEntity<UserResponseDto> findOne(@PathVariable Integer userId) {
         UserResponseDto response = userService.getUserInfo(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/myFindOne")
+    public ResponseEntity<UserResponseDto> myFind() {
+
+        UserResponseDto response = userService.getUserInfo(getCurrentUserId());
         return ResponseEntity.ok(response);
     }
 
