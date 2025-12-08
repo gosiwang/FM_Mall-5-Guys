@@ -32,7 +32,7 @@ public class ReviewResponseDTO {
                 .createdAt(review.getCreatedAt())
                 .updatedAt(review.getUpdatedAt())
                 .userId(review.getUser().getUserId())
-                .orderItemId(review.getOrderItem().getId())
+                .orderItemId(review.getOrderItem().getOrderItemId())
                 .build();
 
     }
