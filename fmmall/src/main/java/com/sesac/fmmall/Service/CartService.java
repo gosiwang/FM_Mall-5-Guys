@@ -40,33 +40,30 @@ public class CartService {
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
         Cart cart = cartRepository.findByUser_UserId(userId)
-                .orElseGet(() -> cartRepository.save(Cart.builder().user(user).build()));
+                .orElseGet(() -> cartRepository.save(new Cart(user)));
 
         CartItem newCartItem = CartItem.createCartItem(product, requestDTO.getQuantity());
         cart.addCartItem(newCartItem);
-        cartRepository.save(cart);
 
         return findAllCartItems(userId);
     }
 
     @Transactional
-    public CartResponseDTO updateCartItemQuantity(int cartItemId, CartItemRequestDTO requestDTO) {
+    public CartResponseDTO updateCartItemQuantity(int userId, int cartItemId, CartItemRequestDTO requestDTO) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 상품을 찾을 수 없습니다."));
-        cartItem.updateQuantity(requestDTO.getQuantity());
 
-        int userId = cartItem.getCart().getUser().getUserId();
+        cartItem.updateQuantity(requestDTO.getQuantity(), userId);
+
         return findAllCartItems(userId);
     }
 
     @Transactional
-    public void removeCartItem(int cartItemId) {
-        CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("삭제할 장바구니 상품을 찾을 수 없습니다."));
+    public void removeCartItem(int userId, int cartItemId) {
+        Cart cart = cartRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자의 장바구니를 찾을 수 없습니다."));
 
-        Cart cart = cartItem.getCart();
-
-        cart.removeCartItem(cartItem);
+        cart.removeCartItem(cartItemId, userId);
     }
 
     @Transactional
