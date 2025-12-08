@@ -14,4 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class WishListResponseDTO {
 
+    private int wishListId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
+    private LocalDateTime createdAt;
+
+    private int userId;
+    private int productId;
 }

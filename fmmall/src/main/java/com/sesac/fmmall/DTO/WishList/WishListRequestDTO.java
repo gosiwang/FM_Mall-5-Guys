@@ -11,5 +11,6 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class WishListRequestDTO {
-
+    private int userId;
+    private int productId;
 }

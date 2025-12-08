@@ -24,12 +24,4 @@ public class InquiryAnswerResponseDTO {
     private int userId;
     private int inquiryId;
 
-//    public static InquiryAnswerResponseDTO from(InquiryAnswer entity) {
-//        return InquiryAnswerResponseDTO.builder()
-//                .userId(entity.getUser().getId())
-//                .inquiryId(entity.getInquiry().getId())
-//                .inquiryAnswerContent(entity.getContent())
-//                .build();
-//    }
-
 }

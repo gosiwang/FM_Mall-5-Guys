@@ -11,5 +11,9 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class ReviewRequestDTO {
+    private Double reviewRating;
+    private String reviewContent;
 
+    private int userId;
+    private int orderItemId;
 }
