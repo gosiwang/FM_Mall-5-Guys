@@ -4,10 +4,10 @@ import com.sesac.fmmall.DTO.Order.OrderCreateRequest;
 import com.sesac.fmmall.DTO.Order.OrderResponse;
 import com.sesac.fmmall.DTO.Order.OrderSummaryResponse;
 import com.sesac.fmmall.Service.OrderService;
-import com.sesac.fmmall.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,50 +19,65 @@ public class OrderController {
 
     private final OrderService orderService;
 
-
-    @PostMapping("/insert/{userId}")
+    /**
+     * 주문 생성 (주문 + 결제 동시 처리)
+     * - /Order/insert   (로그인 사용자 기준)
+     */
+    @PostMapping("/insert")
     public ResponseEntity<OrderResponse> insertOrder(
-            @PathVariable Integer userId,
+            @AuthenticationPrincipal(expression = "userId") Integer userId,
             @RequestBody OrderCreateRequest request
     ) {
         OrderResponse response = orderService.createOrder(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
-    @GetMapping("/findAll/{userId}")
+    /**
+     * 로그인 사용자의 주문 전체 조회 (요약)
+     * - /Order/findAll
+     */
+    @GetMapping("/findAll")
     public ResponseEntity<List<OrderSummaryResponse>> findAllByUser(
-            @PathVariable Integer userId
+            @AuthenticationPrincipal(expression = "userId") Integer userId
     ) {
         List<OrderSummaryResponse> responses = orderService.getOrdersByUser(userId);
         return ResponseEntity.ok(responses);
     }
 
-
-    @GetMapping("/findOne/{orderId}/{userId}")
+    /**
+     * 로그인 사용자의 특정 주문 단건 상세 조회
+     * - /Order/findOne/{orderId}
+     */
+    @GetMapping("/findOne/{orderId}")
     public ResponseEntity<OrderResponse> findOne(
             @PathVariable Integer orderId,
-            @PathVariable Integer userId
+            @AuthenticationPrincipal(expression = "userId") Integer userId
     ) {
         OrderResponse response = orderService.getOrderDetail(orderId, userId);
         return ResponseEntity.ok(response);
     }
 
-
-    @GetMapping("/findByProduct/{userId}/{productId}")
+    /**
+     * 로그인 사용자의 특정 상품에 대한 주문 목록 조회 (상세)
+     * - /Order/findByProduct/{productId}
+     */
+    @GetMapping("/findByProduct/{productId}")
     public ResponseEntity<List<OrderResponse>> findByProduct(
-            @PathVariable Integer userId,
-            @PathVariable Integer productId
+            @PathVariable Integer productId,
+            @AuthenticationPrincipal(expression = "userId") Integer userId
     ) {
         List<OrderResponse> responses = orderService.getOrdersByUserAndProduct(userId, productId);
         return ResponseEntity.ok(responses);
     }
 
-
-    @PutMapping("/cancel/{orderId}/{userId}")
+    /**
+     * 로그인 사용자의 주문 취소
+     * - /Order/cancel/{orderId}
+     */
+    @PutMapping("/cancel/{orderId}")
     public ResponseEntity<Void> cancelOrder(
             @PathVariable Integer orderId,
-            @PathVariable Integer userId
+            @AuthenticationPrincipal(expression = "userId") Integer userId
     ) {
         orderService.cancelOrder(orderId, userId);
         return ResponseEntity.noContent().build();
