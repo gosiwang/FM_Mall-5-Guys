@@ -1,5 +1,6 @@
 package com.sesac.fmmall.Controller;
 
+import com.sesac.fmmall.DTO.Inquiry.InquiryResponseDTO;
 import com.sesac.fmmall.DTO.Review.ReviewRequestDTO;
 import com.sesac.fmmall.DTO.Review.ReviewResponseDTO;
 import com.sesac.fmmall.Service.ReviewService;
@@ -25,12 +26,25 @@ public class ReviewController {
         return ResponseEntity.ok(resultReview);
     }
 
-    /* 2. 최신순 정렬(페이징) -> 주문상품, 유저별로 변경해야함. */
-    @GetMapping("/findAll")
-    public ResponseEntity<Page<ReviewResponseDTO>> findAllByOrderByUpdatedAt(@PathVariable int userId, Pageable pageable) {
-        Page<ReviewResponseDTO> resultReview = reviewService.findReviewByUserIdSortedUpdatedAt(userId, pageable);
+//    /* 2. 최신순 정렬(페이징) -> 주문상품, 유저별로 변경해야함. */
+//    @GetMapping("/findAll")
+//    public ResponseEntity<Page<ReviewResponseDTO>> findAllByOrderByUpdatedAt(@PathVariable int userId, Pageable pageable) {
+//        Page<ReviewResponseDTO> resultReview = reviewService.findReviewByUserIdSortedUpdatedAt(userId, pageable);
+//        // 상태 코드 200(ok)와 함께 JSON 반환
+//        return ResponseEntity.ok(resultReview);
+//    }
+    @GetMapping("/findAll/user/{userId}")
+    public ResponseEntity<Page<ReviewResponseDTO>> findReviewByUserIdSortedUpdatedAt(@PathVariable int userId, Pageable pageable) {
+        Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByUserIdSortedUpdatedAt(userId, pageable);
         // 상태 코드 200(ok)와 함께 JSON 반환
-        return ResponseEntity.ok(resultReview);
+        return ResponseEntity.ok(resultInquiryAnswer);
+    }
+
+    @GetMapping("/findAll/orderItem/{orderItemId}")
+    public ResponseEntity<Page<ReviewResponseDTO>> findReviewByOrderItemIdSortedUpdatedAt(@PathVariable int orderItemId, Pageable pageable) {
+        Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByOrderItemIdSortedUpdatedAt(orderItemId, pageable);
+        // 상태 코드 200(ok)와 함께 JSON 반환
+        return ResponseEntity.ok(resultInquiryAnswer);
     }
 
     /* 3. 리뷰 등록 */

@@ -58,7 +58,7 @@ public class ReviewService {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
 
         // 3. 리포지토리 호출 (유저 ID로 필터링 + 페이징/정렬 적용)
-        Page<Review> reviewList = reviewRepository.findAllByUserUserId(userId, pageRequest);
+        Page<Review> reviewList = reviewRepository.findAllByUser_UserId(userId, pageRequest);
 
         // 4. Entity -> DTO 변환 후 반환
         return reviewList.map(ReviewResponseDTO::from);
@@ -79,7 +79,7 @@ public class ReviewService {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
 
         // 3. 리포지토리 호출 (주문상품 ID로 필터링 + 페이징/정렬 적용)
-        Page<Review> reviewList = reviewRepository.findAllByOrderItemOrderItemId(orderItemId, pageRequest);
+        Page<Review> reviewList = reviewRepository.findAllByOrderItem_OrderItemId(orderItemId, pageRequest);
 
         // 4. Entity -> DTO 변환 후 반환
         return reviewList.map(ReviewResponseDTO::from);

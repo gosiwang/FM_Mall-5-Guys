@@ -1,5 +1,6 @@
 package com.sesac.fmmall.Controller;
 
+import com.sesac.fmmall.DTO.Inquiry.InquiryAnswerResponseDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryRequestDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryResponseDTO;
 import com.sesac.fmmall.Service.InquiryService;
@@ -27,12 +28,26 @@ public class InquiryController {
         return ResponseEntity.ok(resultInquiry);
     }
 
-    /* 2. 최신순 정렬(페이징) -> 상품, 유저별로 변경해야함. */
-    @GetMapping("/findAll")
-    public ResponseEntity<Page<InquiryResponseDTO>> findAllByOrderByUpdatedAt(Pageable pageable) {
-        Page<InquiryResponseDTO> resultInquiry = inquiryService.findAllSortedUpdatedAt(pageable);
+//    /* 2. 최신순 정렬(페이징) -> 상품, 유저별로 변경해야함. */
+//    @GetMapping("/findAll")
+//    public ResponseEntity<Page<InquiryResponseDTO>> findAllByOrderByUpdatedAt(Pageable pageable) {
+//        Page<InquiryResponseDTO> resultInquiry = inquiryService.findAllSortedUpdatedAt(pageable);
+//        // 상태 코드 200(ok)와 함께 JSON 반환
+//        return ResponseEntity.ok(resultInquiry);
+//    }
+    /* 2. 최신순 정렬(페이징) -> 유저, 상품 */
+    @GetMapping("/findAll/user/{userId}")
+    public ResponseEntity<Page<InquiryResponseDTO>> findInquiryByUserIdSortedUpdatedAt(@PathVariable int userId, Pageable pageable) {
+        Page<InquiryResponseDTO> resultInquiryAnswer = inquiryService.findInquiryByUserIdSortedUpdatedAt(userId, pageable);
         // 상태 코드 200(ok)와 함께 JSON 반환
-        return ResponseEntity.ok(resultInquiry);
+        return ResponseEntity.ok(resultInquiryAnswer);
+    }
+
+    @GetMapping("/findAll/product/{productId}")
+    public ResponseEntity<Page<InquiryResponseDTO>> findInquiryByProductIdSortedUpdatedAt(@PathVariable int productId, Pageable pageable) {
+        Page<InquiryResponseDTO> resultInquiryAnswer = inquiryService.findInquiryByProductIdSortedUpdatedAt(productId, pageable);
+        // 상태 코드 200(ok)와 함께 JSON 반환
+        return ResponseEntity.ok(resultInquiryAnswer);
     }
 
     /* 3. 문의 등록 */
