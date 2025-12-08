@@ -10,5 +10,5 @@ import lombok.*;
 public class CartItemRequestDTO {
 
     private int productId;
-    private int quantity;
+    private int cartItemQuantity;
 }
