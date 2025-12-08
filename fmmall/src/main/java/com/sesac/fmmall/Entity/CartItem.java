@@ -18,7 +18,8 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cartItemId;
 
-    private int quantity;
+    @Column(name = "cart_item_quantity")
+    private int cartItemQuantity = 1;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -42,30 +43,29 @@ public class CartItem {
         if (quantity < 1) {
             throw new IllegalArgumentException("수량은 1개 이상이어야 합니다.");
         }
-        // 생성 시점에도 재고 확인
         if (quantity > product.getStockQuantity()) {
             throw new IllegalArgumentException("상품의 재고가 부족합니다.");
         }
         CartItem cartItem = new CartItem();
         cartItem.product = product;
-        cartItem.quantity = quantity;
+        cartItem.cartItemQuantity = quantity;
         cartItem.checkStatus = "N";
         return cartItem;
     }
 
-    /**
-     * 수량을 업데이트합니다. 수량은 1 이상이어야 하며, 상품 재고를 초과할 수 없습니다.
-     * @param quantity 새로운 수량
-     */
-    public void updateQuantity(int quantity) {
-        if (quantity < 1) {
+    public void updateQuantity(int newQuantity, int requesterUserId) {
+
+        if (this.getCart().getUser().getUserId() != requesterUserId) {
+            throw new IllegalStateException("다른 사용자의 장바구니 상품을 수정할 권한이 없습니다.");
+        }
+        if (newQuantity < 1) {
             throw new IllegalArgumentException("상품 수량은 1개 이상이어야 합니다.");
         }
-        // 재고 확인 로직
-        if (this.product != null && quantity > this.product.getStockQuantity()) {
+        if (this.product != null && newQuantity > this.product.getStockQuantity()) {
             throw new IllegalArgumentException("상품의 재고가 부족합니다.");
         }
-        this.quantity = quantity;
+
+        this.cartItemQuantity = newQuantity;
     }
 
     public void updateCheckStatus(String checkStatus) {

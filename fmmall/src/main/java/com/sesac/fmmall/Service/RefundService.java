@@ -1,7 +1,9 @@
 package com.sesac.fmmall.Service;
 
+import com.sesac.fmmall.Constant.RefundReasonCode;
 import com.sesac.fmmall.Constant.RefundStatus;
 import com.sesac.fmmall.Constant.RefundType;
+import com.sesac.fmmall.Constant.UserRole;
 import com.sesac.fmmall.Constant.YesNo;
 import com.sesac.fmmall.DTO.Refund.RefundCreateRequest;
 import com.sesac.fmmall.DTO.Refund.RefundItemCreateRequest;
@@ -26,6 +28,7 @@ public class RefundService {
     private final PaymentRepository paymentRepository;
     private final RefundRepository refundRepository;
     private final RefundItemRepository refundItemRepository;
+    private final UserRepository userRepository;   // ✅ 관리자 권한 체크용
 
     private final ModelMapper modelMapper;
 
@@ -45,15 +48,41 @@ public class RefundService {
         Payment payment = paymentRepository.findById(request.getPaymentId())
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다. paymentId=" + request.getPaymentId()));
 
-        if (payment.getOrder().getId() != order.getId()) {
+        if (payment.getOrder().getOrderId() != order.getOrderId()) {
             throw new IllegalArgumentException("주문과 결제 정보가 일치하지 않습니다.");
         }
 
 
-        RefundType refundType = RefundType.valueOf(request.getRefundType());
+        RefundReasonCode reasonCodeEnum;
+        try {
+            reasonCodeEnum = RefundReasonCode.valueOf(request.getReasonCode());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "유효하지 않은 환불 사유 코드입니다. reasonCode=" + request.getReasonCode()
+            );
+        }
+
+
+        RefundType refundType;
+        try {
+            refundType = RefundType.valueOf(request.getRefundType());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "유효하지 않은 환불 타입입니다. refundType=" + request.getRefundType()
+            );
+        }
+
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new IllegalArgumentException("환불 상품이 없습니다.");
+        }
+
+
+        Map<Integer, Integer> alreadyRefundedByOrderItemId = new HashMap<>();
+        Map<Integer, Integer> requestedQtyByOrderItemId = new HashMap<>();
+
 
         Refund refund = Refund.builder()
-                .reasonCode(request.getReasonCode())
+                .reasonCode(reasonCodeEnum.name())
                 .reasonDetail(request.getReasonDetail())
                 .totalAmount(0)
                 .refundType(refundType)
@@ -62,10 +91,6 @@ public class RefundService {
                 .payment(payment)
                 .build();
 
-        if (request.getItems() == null || request.getItems().isEmpty()) {
-            throw new IllegalArgumentException("환불 상품이 없습니다.");
-        }
-
 
         for (RefundItemCreateRequest itemReq : request.getItems()) {
 
@@ -73,8 +98,8 @@ public class RefundService {
                     .orElseThrow(() -> new IllegalArgumentException(
                             "주문 상품이 존재하지 않습니다. orderItemId=" + itemReq.getOrderItemId()));
 
-            if (orderItem.getOrder().getId() != order.getId()) {
-                throw new IllegalArgumentException("해당 주문에 속하지 않는 주문상품입니다. orderItemId=" + orderItem.getId());
+            if (orderItem.getOrder().getOrderId() != order.getOrderId()) {
+                throw new IllegalArgumentException("해당 주문에 속하지 않는 주문상품입니다. orderItemId=" + orderItem.getOrderItemId());
             }
 
             Integer refundQuantity = itemReq.getRefundQuantity();
@@ -83,13 +108,22 @@ public class RefundService {
             }
 
 
-            int alreadyRefunded = refundItemRepository.findByOrderItem(orderItem).stream()
-                    .mapToInt(RefundItem::getRefundQuantity)
-                    .sum();
+            int orderItemId = orderItem.getOrderItemId();
+            int alreadyRefunded = alreadyRefundedByOrderItemId.computeIfAbsent(
+                    orderItemId,
+                    id -> refundItemRepository.findByOrderItem(orderItem).stream()
+                            .mapToInt(RefundItem::getRefundQuantity)
+                            .sum()
+            );
 
-            if (alreadyRefunded + refundQuantity > orderItem.getQuantity()) {
+
+            requestedQtyByOrderItemId.merge(orderItemId, refundQuantity, Integer::sum);
+
+
+            int afterTotal = alreadyRefunded + requestedQtyByOrderItemId.get(orderItemId);
+            if (afterTotal > orderItem.getQuantity()) {
                 throw new IllegalArgumentException(
-                        "환불 수량이 주문 수량을 초과합니다. orderItemId=" + orderItem.getId());
+                        "환불 수량이 주문 수량을 초과합니다. orderItemId=" + orderItemId);
             }
 
             int productPrice = orderItem.getProduct().getPrice();
@@ -99,14 +133,29 @@ public class RefundService {
                     .orderItem(orderItem)
                     .refundQuantity(refundQuantity)
                     .refundPrice(refundPrice)
-                    .refundStatus(RefundStatus.REQUESTED)
+                    .refundStatus(RefundStatus.REQUESTED)   // 최초 상태: REQUESTED(요청됨)
                     .refund(refund)
                     .build();
 
             refund.addRefundItem(refundItem);
         }
 
-        // 총 환불 금액 계산
+
+        boolean isFullRefund = isFullRefundForOrder(
+                order,
+                alreadyRefundedByOrderItemId,
+                requestedQtyByOrderItemId
+        );
+
+        if (refundType == RefundType.FULL && !isFullRefund) {
+            throw new IllegalArgumentException("환불 타입이 FULL이지만, 주문 전체 수량이 모두 환불되도록 선택되지 않았습니다.");
+        }
+
+        if (refundType == RefundType.PARTIAL && isFullRefund) {
+            throw new IllegalArgumentException("환불 타입이 PARTIAL인데, 결과적으로 주문 전체가 모두 환불되도록 요청되었습니다.");
+        }
+
+
         refund.setTotalAmount(refund.calculateTotalAmount());
 
         Refund savedRefund = refundRepository.save(refund);
@@ -114,11 +163,36 @@ public class RefundService {
         return mapToRefundResponse(savedRefund);
     }
 
-    /* Refund/findAll/{userId} / GET / 사용자 본인의 환불 전체 조회 */
+    /**
+     * 주문 기준으로 "이번 요청까지 포함했을 때 전체가 다 환불되는지" 판단하는 헬퍼 메서드
+     */
+    private boolean isFullRefundForOrder(
+            Order order,
+            Map<Integer, Integer> alreadyRefundedByOrderItemId,
+            Map<Integer, Integer> requestedQtyByOrderItemId
+    ) {
+        for (OrderItem orderItem : order.getOrderItems()) {
+
+            int orderItemId = orderItem.getOrderItemId();
+
+            int alreadyRefunded = alreadyRefundedByOrderItemId.getOrDefault(orderItemId, 0);
+            int requestedQty = requestedQtyByOrderItemId.getOrDefault(orderItemId, 0);
+
+            int afterTotal = alreadyRefunded + requestedQty;
+
+
+            if (afterTotal != orderItem.getQuantity()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     @Transactional
     public List<RefundResponse> getRefundsByUser(Integer userId) {
 
-        // userId 기준으로 주문 조회 → 각 주문의 환불 목록
+
         List<Order> orders = orderRepository.findByUser_UserId(userId);
 
         List<Refund> allRefunds = new ArrayList<>();
@@ -131,27 +205,27 @@ public class RefundService {
                 .collect(Collectors.toList());
     }
 
-    /* Refund/findByProduct/{userId}/{productId} / GET / 환불 기록에서 "환불 상품 기준" 조회 */
+
     @Transactional
     public List<RefundResponse> getRefundsByUserAndProduct(Integer userId, Integer productId) {
 
-        // productId로 주문상품 찾기
+
         List<OrderItem> orderItems = orderItemRepository.findByProduct_ProductId(productId);
 
         Set<Integer> refundIdSet = new LinkedHashSet<>();
         List<Refund> resultRefunds = new ArrayList<>();
 
         for (OrderItem orderItem : orderItems) {
-            // 해당 주문이 userId의 주문인지 확인
+
             if (orderItem.getOrder().getUser().getUserId() != userId) {
                 continue;
             }
 
-            // 주문상품에 연결된 환불아이템들 조회
+
             List<RefundItem> refundItems = refundItemRepository.findByOrderItem(orderItem);
             for (RefundItem refundItem : refundItems) {
                 Refund refund = refundItem.getRefund();
-                if (refundIdSet.add(refund.getId())) {
+                if (refundIdSet.add(refund.getRefundId())) {
                     resultRefunds.add(refund);
                 }
             }
@@ -162,7 +236,7 @@ public class RefundService {
                 .collect(Collectors.toList());
     }
 
-    /* Refund/findOne/{refundId} / GET / 환불 단건 상세 조회 */
+
     @Transactional
     public RefundResponse getRefundDetail(Integer refundId) {
 
@@ -173,20 +247,100 @@ public class RefundService {
         return mapToRefundResponse(refund);
     }
 
-    // ===================== 매핑 메서드 ===================== //
+
+    @Transactional
+    public RefundResponse approveRefund(Integer refundId, Integer adminUserId) {
+
+        User admin = userRepository.findById(adminUserId)
+                .orElseThrow(() -> new IllegalArgumentException("관리자 정보를 찾을 수 없습니다. userId=" + adminUserId));
+
+        if (admin.getRole() != UserRole.ADMIN) {
+            throw new IllegalStateException("관리자만 환불을 승인할 수 있습니다.");
+        }
+
+        Refund refund = refundRepository.findById(refundId)
+                .orElseThrow(() -> new IllegalArgumentException("환불 정보가 존재하지 않습니다. refundId=" + refundId));
+
+        for (RefundItem item : refund.getRefundItems()) {
+            if (item.getRefundStatus() != RefundStatus.REQUESTED) {
+                throw new IllegalStateException(
+                        "REQUESTED 상태가 아닌 환불아이템이 포함되어 있어 승인할 수 없습니다. refundItemId=" + item.getRefundItemId());
+            }
+            item.changeStatus(RefundStatus.APPROVED);
+        }
+
+        return mapToRefundResponse(refund);
+    }
+
+
+    @Transactional
+    public RefundResponse rejectRefund(Integer refundId, Integer adminUserId) {
+
+        User admin = userRepository.findById(adminUserId)
+                .orElseThrow(() -> new IllegalArgumentException("관리자 정보를 찾을 수 없습니다. userId=" + adminUserId));
+
+        if (admin.getRole() != UserRole.ADMIN) {
+            throw new IllegalStateException("관리자만 환불을 거절할 수 있습니다.");
+        }
+
+        Refund refund = refundRepository.findById(refundId)
+                .orElseThrow(() -> new IllegalArgumentException("환불 정보가 존재하지 않습니다. refundId=" + refundId));
+
+        for (RefundItem item : refund.getRefundItems()) {
+            if (item.getRefundStatus() != RefundStatus.REQUESTED) {
+                throw new IllegalStateException(
+                        "REQUESTED 상태가 아닌 환불아이템이 포함되어 있어 거절할 수 없습니다. refundItemId=" + item.getRefundItemId());
+            }
+            item.changeStatus(RefundStatus.REJECTED);
+        }
+
+        refund.setIsTrue(YesNo.N);
+
+        return mapToRefundResponse(refund);
+    }
+
+
+    @Transactional
+    public RefundResponse completeRefund(Integer refundId, Integer adminUserId) {
+
+        User admin = userRepository.findById(adminUserId)
+                .orElseThrow(() -> new IllegalArgumentException("관리자 정보를 찾을 수 없습니다. userId=" + adminUserId));
+
+        if (admin.getRole() != UserRole.ADMIN) {
+            throw new IllegalStateException("관리자만 환불 완료 처리를 할 수 있습니다.");
+        }
+
+        Refund refund = refundRepository.findById(refundId)
+                .orElseThrow(() -> new IllegalArgumentException("환불 정보가 존재하지 않습니다. refundId=" + refundId));
+
+        for (RefundItem item : refund.getRefundItems()) {
+            if (item.getRefundStatus() != RefundStatus.APPROVED
+                    && item.getRefundStatus() != RefundStatus.COMPLETED) {
+                throw new IllegalStateException(
+                        "APPROVED 상태가 아닌 환불아이템이 포함되어 있어 완료 처리할 수 없습니다. refundItemId=" + item.getRefundItemId());
+            }
+            item.changeStatus(RefundStatus.COMPLETED);
+        }
+
+        refund.setIsTrue(YesNo.Y);
+
+        return mapToRefundResponse(refund);
+    }
+
+
 
     private RefundResponse mapToRefundResponse(Refund refund) {
 
         RefundResponse dto = modelMapper.map(refund, RefundResponse.class);
 
-        dto.setRefundId(refund.getId());
+        dto.setRefundId(refund.getRefundId());
         dto.setReasonCode(refund.getReasonCode());
         dto.setReasonDetail(refund.getReasonDetail());
         dto.setTotalAmount(refund.getTotalAmount());
         dto.setRefundType(refund.getRefundType().name());
         dto.setIsTrue(refund.getIsTrue().name());
-        dto.setOrderId(refund.getOrder().getId());
-        dto.setPaymentId(refund.getPayment().getId());
+        dto.setOrderId(refund.getOrder().getOrderId());
+        dto.setPaymentId(refund.getPayment().getPaymentId());
 
         List<RefundItemResponse> itemDtos = refund.getRefundItems().stream()
                 .map(this::mapToRefundItemResponse)
@@ -200,8 +354,8 @@ public class RefundService {
 
         RefundItemResponse dto = modelMapper.map(item, RefundItemResponse.class);
 
-        dto.setRefundItemId(item.getId());
-        dto.setOrderItemId(item.getOrderItem().getId());
+        dto.setRefundItemId(item.getRefundItemId());
+        dto.setOrderItemId(item.getOrderItem().getOrderItemId());
         dto.setRefundQuantity(item.getRefundQuantity());
         dto.setRefundPrice(item.getRefundPrice());
         dto.setRefundStatus(item.getRefundStatus().name());

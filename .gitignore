@@ -1,48 +1,43 @@
 HELP.md
-
-### Gradle ###
-fmmall/.gradle/
-fmmall/build/
-!fmmall/gradle/wrapper/gradle-wrapper.jar
-!fmmall/**/src/main/**/build/
-!fmmall/**/src/test/**/build/
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 ### STS ###
-fmmall/.apt_generated
-fmmall/.classpath
-fmmall/.factorypath
-fmmall/.project
-fmmall/.settings
-fmmall/.springBeans
-fmmall/.sts4-cache
-fmmall/bin/
-!fmmall/**/src/main/**/bin/
-!fmmall/**/src/test/**/bin/
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-fmmall/.idea/
-fmmall/*.iws
-fmmall/*.iml
-fmmall/*.ipr
-fmmall/out/
-!fmmall/**/src/main/**/out/
-!fmmall/**/src/test/**/out/
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
 
 ### NetBeans ###
-fmmall/nbproject/private/
-fmmall/nbbuild/
-fmmall/dist/
-fmmall/nbdist/
-fmmall/.nb-gradle/
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 
 ### VS Code ###
-fmmall/.vscode/
+.vscode/
 
-### OS / Editor ###
-.DS_Store
-Thumbs.db
 
-### Local config (yml 외부 유출 방지) ###
+### Local config ###
 fmmall/src/main/resources/application.yml
 fmmall/src/main/resources/application-local.yml
 fmmall/src/main/resources/application-*.yml
