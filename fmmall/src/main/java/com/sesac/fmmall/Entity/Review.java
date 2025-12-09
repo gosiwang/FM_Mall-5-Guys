@@ -34,8 +34,8 @@ public class Review {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_item_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_item_id", unique = true)
     private OrderItem orderItem;
 
     public void modify(String content, Double rating){
