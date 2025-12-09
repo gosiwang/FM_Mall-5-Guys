@@ -1,12 +1,15 @@
 package com.sesac.fmmall.Controller;
 
 import com.sesac.fmmall.DTO.CategoryDTO;
+import com.sesac.fmmall.DTO.Product.ProductResponseDTO;
 import com.sesac.fmmall.Service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/Category")
@@ -35,7 +38,17 @@ public class CategoryController {
     }
 
     /* categoryId값을 넘겨, 해당 상위 카테고리 정보 삭제 진행 */
+    @DeleteMapping("/delete/{categoryId}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable int categoryId) {
+        categoryService.deleteCategory(categoryId);
+        return ResponseEntity.noContent().build();
+    }
 
     /* categoryId값을 넘겨 해당 상위카테고리의 전체 상품 목록 조회. */
+    @GetMapping("/findAll/{categoryId}")
+    public ResponseEntity<List<ProductResponseDTO>> getAllProductsByCategory(@PathVariable int categoryId) {
+        List<ProductResponseDTO> products = categoryService.findAllProductsByCategoryId(categoryId);
+        return ResponseEntity.ok(products);
+    }
 
 }
