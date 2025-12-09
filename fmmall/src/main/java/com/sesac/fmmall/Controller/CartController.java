@@ -12,52 +12,50 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/Cart")
 @RequiredArgsConstructor
-public class CartController {
+public class CartController extends BaseController {
 
     private final CartService cartService;
 
     // 장바구니 상품 추가
-    @PostMapping("/insert/{userId}")
+    @PostMapping("/insert/")
     public ResponseEntity<CartResponseDTO> addCartItem(
-            @PathVariable int userId,
             @RequestBody CartItemCreateRequestDTO requestDTO
     ) {
-        CartResponseDTO response = cartService.createCartItem(userId, requestDTO);
+        CartResponseDTO response = cartService.createCartItem(getCurrentUserId(), requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 장바구니 상품 수량 변경
-    @PutMapping("/modify/{userId}/{cartItemId}")
+    @PutMapping("/modify/{cartItemId}")
     public ResponseEntity<CartResponseDTO> modifyCartItem(
-            @PathVariable int userId,
             @PathVariable int cartItemId,
             @RequestBody CartItemUpdateRequestDTO requestDTO
     ) {
-        CartResponseDTO response = cartService.updateCartItemQuantity(userId, cartItemId, requestDTO);
+        CartResponseDTO response = cartService.updateCartItemQuantity(getCurrentUserId(), cartItemId, requestDTO);
         return ResponseEntity.ok(response);
     }
 
     // 장바구니 상품 삭제
-    @DeleteMapping("/delete/{userId}/{cartItemId}")
+    @DeleteMapping("/delete/{cartItemId}")
     public ResponseEntity<Void> deleteCartItem(
-            @PathVariable int userId,
             @PathVariable int cartItemId
     ) {
-        cartService.removeCartItem(userId, cartItemId);
+        cartService.removeCartItem(getCurrentUserId(), cartItemId);
         return ResponseEntity.noContent().build();
     }
 
     // 장바구니 전체 삭제 (유저 기준)
-    @DeleteMapping("/deleteAll/{userId}")
-    public ResponseEntity<Void> clearCart(@PathVariable int userId) {
-        cartService.clearCart(userId);
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<Void> clearCart() {
+        cartService.clearCart(getCurrentUserId());
         return ResponseEntity.noContent().build();
     }
 
     // 장바구니 목록 조회 (유저 기준)
-    @GetMapping("/findAll/{userId}")
-    public ResponseEntity<CartResponseDTO> findAllCartItems(@PathVariable int userId) {
-        CartResponseDTO response = cartService.findAllCartItems(userId);
+    @GetMapping("/findAll")
+    public ResponseEntity<CartResponseDTO> findAllCartItems() {
+
+        CartResponseDTO response = cartService.findAllCartItems(getCurrentUserId());
         return ResponseEntity.ok(response);
     }
 }
