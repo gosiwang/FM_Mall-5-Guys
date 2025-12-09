@@ -1,6 +1,5 @@
 package com.sesac.fmmall.Controller;
 
-import com.sesac.fmmall.DTO.CartItem.CartItemCheckStatusRequestDTO;
 import com.sesac.fmmall.DTO.CartItem.CartItemCreateRequestDTO;
 import com.sesac.fmmall.DTO.CartItem.CartItemUpdateRequestDTO;
 import com.sesac.fmmall.DTO.CartResponseDTO;
@@ -33,16 +32,6 @@ public class CartController extends BaseController {
             @RequestBody CartItemUpdateRequestDTO requestDTO
     ) {
         CartResponseDTO response = cartService.updateCartItemQuantity(getCurrentUserId(), cartItemId, requestDTO);
-        return ResponseEntity.ok(response);
-    }
-
-    // 장바구니 상품 체크상태 변경
-    @PutMapping("/check/{cartItemId}")
-    public ResponseEntity<CartResponseDTO> checkCartItem(
-            @PathVariable int cartItemId,
-            @RequestBody CartItemCheckStatusRequestDTO requestDTO
-    ) {
-        CartResponseDTO response = cartService.updateCartItemCheckStatus(getCurrentUserId(), cartItemId, requestDTO);
         return ResponseEntity.ok(response);
     }
 

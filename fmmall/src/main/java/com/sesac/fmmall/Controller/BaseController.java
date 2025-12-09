@@ -9,4 +9,5 @@ public abstract class BaseController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (int) auth.getPrincipal();
     }
+
 }

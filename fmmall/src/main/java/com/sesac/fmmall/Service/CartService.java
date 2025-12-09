@@ -1,6 +1,5 @@
 package com.sesac.fmmall.Service;
 
-import com.sesac.fmmall.DTO.CartItem.CartItemCheckStatusRequestDTO;
 import com.sesac.fmmall.DTO.CartItem.CartItemCreateRequestDTO;
 import com.sesac.fmmall.DTO.CartItem.CartItemResponseDTO;
 import com.sesac.fmmall.DTO.CartItem.CartItemUpdateRequestDTO;
@@ -56,16 +55,6 @@ public class CartService {
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 상품을 찾을 수 없습니다."));
 
         cartItem.updateQuantity(requestDTO.getQuantity(), userId);
-
-        return findAllCartItems(userId);
-    }
-
-    @Transactional
-    public CartResponseDTO updateCartItemCheckStatus(int userId, int cartItemId, CartItemCheckStatusRequestDTO requestDTO) {
-        CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("장바구니 상품을 찾을 수 없습니다."));
-
-        cartItem.updateCheckStatus(requestDTO.getCheckStatus(), userId);
 
         return findAllCartItems(userId);
     }
