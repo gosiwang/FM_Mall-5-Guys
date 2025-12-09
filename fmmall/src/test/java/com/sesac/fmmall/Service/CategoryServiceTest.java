@@ -167,7 +167,7 @@ class CategoryServiceTest {
                 .isNotEmpty();
 
         // 너무 중요한 데이터 피하고 싶으면 맨 처음/맨 마지막 등 하나 고르면 됨
-        Category target = all.get(0);
+        Category target = all.get(3);
         int categoryId = target.getCategoryId();
 
         System.out.println("삭제 대상 카테고리 ID = " + categoryId + ", name = " + target.getName());
