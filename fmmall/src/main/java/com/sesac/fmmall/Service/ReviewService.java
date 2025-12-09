@@ -77,6 +77,7 @@ public class ReviewService {
         // DTO -> Entity 변환 (builder 패턴 사용)
         Review newReview = Review.builder()
                 .reviewContent(requestDTO.getReviewContent())
+                .reviewRating(requestDTO.getReviewRating())
                 .user(user)
                 .orderItem(orderItem)
                 .build();
