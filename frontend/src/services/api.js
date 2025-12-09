@@ -71,11 +71,17 @@ export const productAPI = {
 
 // 카테고리 관련 API
 export const categoryAPI = {
+    // 전체 카테고리 조회
     getAllCategories: () =>
-        apiClient.get('/Category/findAll'),  //  ColumnCategory → Category
+        apiClient.get('/Category/findAll'),
 
-    getSubCategories: (columnCategoryId) =>
-        apiClient.get(`/RowCategory/findByColumn/${columnCategoryId}`),
+    // 전체 브랜드 조회
+    getAllBrands: () =>
+        apiClient.get('/Brand/findAll'),
+
+    // 카테고리별 하위 카테고리 조회
+    getRowCategories: (categoryId) =>
+        apiClient.get(`/RowCategory/findByCategoryId/${categoryId}`),
 };
 
 // 주소 관련 API
@@ -118,6 +124,20 @@ export const adminAPI = {
   
   deleteUser: (userId) => 
     apiClient.delete(`/Admin/User/delete/${userId}`),
+};
+
+export const adminProductAPI = {
+    // 상품 등록
+    createProduct: (productData) =>
+        apiClient.post('/Admin/Product/insert', productData),
+
+    // 상품 수정
+    updateProduct: (productId, productData) =>
+        apiClient.put(`/Admin/Product/modify/${productId}`, productData),
+
+    // 상품 삭제
+    deleteProduct: (productId) =>
+        apiClient.delete(`/Admin/Product/delete/${productId}`),
 };
 
 // 장바구니 관련 API - api.js에 추가할 코드
