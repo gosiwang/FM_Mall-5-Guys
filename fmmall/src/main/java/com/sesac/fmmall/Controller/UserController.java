@@ -7,6 +7,7 @@ import com.sesac.fmmall.Security.JwtTokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class UserController extends BaseController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findOne/{userId}")
     public ResponseEntity<UserResponseDto> findOne(@PathVariable Integer userId) {
         UserResponseDto response = userService.getUserInfo(userId);
@@ -52,6 +54,7 @@ public class UserController extends BaseController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/modify/{userId}")
     public ResponseEntity<UserResponseDto> modify(
             @PathVariable Integer userId,
