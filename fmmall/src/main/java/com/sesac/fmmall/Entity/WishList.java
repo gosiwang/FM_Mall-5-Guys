@@ -8,6 +8,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "wish_list")
+//        , uniqueConstraints = {
+//        @UniqueConstraint(
+//                columnNames = {"user_id", "product_id"}
+//        )
+//        }
+//)
 @Getter
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

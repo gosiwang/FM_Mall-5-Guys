@@ -33,14 +33,14 @@ public class ReviewController {
 //        // 상태 코드 200(ok)와 함께 JSON 반환
 //        return ResponseEntity.ok(resultReview);
 //    }
-    @GetMapping("/findAll/user/{userId}/{curPage}")
+    @GetMapping("/findByUser/{userId}/{curPage}")
     public ResponseEntity<Page<ReviewResponseDTO>> findReviewByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
         Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByUserIdSortedUpdatedAt(userId, curPage);
         // 상태 코드 200(ok)와 함께 JSON 반환
         return ResponseEntity.ok(resultInquiryAnswer);
     }
 
-    @GetMapping("/findAll/orderItem/{orderItemId}/{curPage}")
+    @GetMapping("/findByOrderItem/{orderItemId}/{curPage}")
     public ResponseEntity<Page<ReviewResponseDTO>> findReviewByOrderItemIdSortedUpdatedAt(@PathVariable int orderItemId, @PathVariable int curPage) {
         Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByOrderItemIdSortedUpdatedAt(orderItemId, curPage);
         // 상태 코드 200(ok)와 함께 JSON 반환
@@ -64,12 +64,18 @@ public class ReviewController {
     }
 
     /* 5. 리뷰 삭제 */
-    @DeleteMapping("/delete/{reviewId} ")
+    @DeleteMapping("/delete/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable int reviewId) {
 
         reviewService.deleteReview(reviewId);
 
 //        삭제 성공 시 내용 없이 204 반환
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<Void> deleteAllReview() {
+        reviewService.deleteAllReview();
         return ResponseEntity.noContent().build();
     }
 }

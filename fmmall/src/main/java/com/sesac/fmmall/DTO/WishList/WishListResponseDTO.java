@@ -1,10 +1,8 @@
 package com.sesac.fmmall.DTO.WishList;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.sesac.fmmall.Entity.WishList;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class WishListResponseDTO {
 
     private int wishListId;
@@ -20,4 +20,23 @@ public class WishListResponseDTO {
 
     private int userId;
     private int productId;
+
+    private boolean isAdded;
+
+
+    public static WishListResponseDTO from(WishList wishList) {
+        return WishListResponseDTO.builder()
+                .wishListId(wishList.getWishListId())
+                .createdAt(wishList.getCreatedAt())
+                .userId(wishList.getUser().getUserId())
+                .productId(wishList.getProduct().getProductId())
+                .isAdded(true)
+                .build();
+    }
+
+    public static WishListResponseDTO removedDTO() {
+        return WishListResponseDTO.builder()
+                .isAdded(false)
+                .build();
+    }
 }
