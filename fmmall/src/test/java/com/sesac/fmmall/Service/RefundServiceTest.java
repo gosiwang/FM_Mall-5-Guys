@@ -238,8 +238,22 @@ class RefundServiceTest {
         assertThat(response.getItems().get(0).getRefundQuantity()).isEqualTo(1);
 
         // 실제 DB에 Refund / RefundItem 이 생성됐는지 확인
-        assertThat(refundRepository.findAll()).hasSize(1);
-        assertThat(refundItemRepository.findAll()).hasSize(1);
+        // 이번에 생성된 refundId 기준으로만 검증
+        Refund savedRefund = refundRepository.findById(response.getRefundId())
+                .orElseThrow(() -> new AssertionError("생성된 Refund가 DB에 존재하지 않습니다."));
+
+        assertThat(savedRefund.getTotalAmount()).isEqualTo(response.getTotalAmount());
+        assertThat(savedRefund.getOrder().getOrderId()).isEqualTo(order.getOrderId());
+        assertThat(savedRefund.getPayment().getPaymentId()).isEqualTo(payment.getPaymentId());
+
+// 이 Refund에 연결된 RefundItem만 필터링해서 검증
+        List<RefundItem> itemsForThisRefund = refundItemRepository.findAll().stream()
+                .filter(ri -> ri.getRefund().getRefundId() == response.getRefundId())
+                .toList();
+
+        assertThat(itemsForThisRefund).hasSize(1);
+        assertThat(itemsForThisRefund.get(0).getRefundQuantity()).isEqualTo(1);
+
     }
 
     @Test
