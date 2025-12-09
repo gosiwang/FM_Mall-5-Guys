@@ -72,6 +72,7 @@ public class OrderService {
 
         // 3. 배송지 선택 (addressId 있으면 해당 주소, 없으면 기본 배송지 사용)
         Address shippingAddress;
+
         if (request.getAddressId() != null) {
             shippingAddress = addressRepository.findById(request.getAddressId())
                     .orElseThrow(() -> new IllegalArgumentException(
