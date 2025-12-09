@@ -27,7 +27,7 @@ public class ReviewController extends BaseController {
             @ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
             @ApiResponse(responseCode = "404", description = "리뷰를 찾을 수 없음")
     })
-    @GetMapping("/find/{reviewId}")
+    @GetMapping("/findOne/{reviewId}")
     public ResponseEntity<ReviewResponseDTO> findReviewById(@PathVariable int reviewId) {
         ReviewResponseDTO resultReview = reviewService.findReviewByReviewId(reviewId);
 

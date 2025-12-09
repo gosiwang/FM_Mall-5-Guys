@@ -18,7 +18,7 @@ public class InquiryAnswerController extends BaseController {
     private final InquiryAnswerService inquiryAnswerService;
 
     /* 1. 특정 아이디로 조회 */
-    @GetMapping("/find/{inquiryAnswerId}")
+    @GetMapping("/findOne/{inquiryAnswerId}")
     public ResponseEntity<InquiryAnswerResponseDTO> findInquiryAnswerById(@PathVariable int inquiryAnswerId) {
         InquiryAnswerResponseDTO resultInquiryAnswer = inquiryAnswerService.findInquiryAnswerByInquiryAnswerId(inquiryAnswerId);
         return ResponseEntity.ok(resultInquiryAnswer);
