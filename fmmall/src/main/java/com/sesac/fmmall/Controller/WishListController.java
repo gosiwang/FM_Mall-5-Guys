@@ -12,7 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "WishList", description = "위시리스트 API")
+@Tag(name = "위시리스트 API")
 @RestController
 @RequestMapping("/WishList")
 @RequiredArgsConstructor
