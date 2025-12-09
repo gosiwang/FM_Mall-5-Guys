@@ -39,7 +39,7 @@ public class CategoryController {
 //                .status(HttpStatus.CREATED)
 //                .body(savedCategory);
 //    }
-
+//
 //    @Operation(summary = "[관리자] 카테고리 수정", description = "기존 카테고리의 정보를 수정합니다.")
 //    @ApiResponses({
 //            @ApiResponse(responseCode = "200", description = "카테고리 수정 성공"),
@@ -51,7 +51,7 @@ public class CategoryController {
 //        CategoryDTO updatedCategory = categoryService.modifyCategory(categoryId, categoryDTO);
 //        return ResponseEntity.ok(updatedCategory);
 //    }
-
+//
 //    @Operation(summary = "[관리자] 카테고리 삭제", description = "카테고리를 삭제합니다.")
 //    @ApiResponses({
 //            @ApiResponse(responseCode = "204", description = "카테고리 삭제 성공"),
