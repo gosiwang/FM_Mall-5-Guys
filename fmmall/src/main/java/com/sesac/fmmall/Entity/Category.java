@@ -1,5 +1,6 @@
 package com.sesac.fmmall.Entity;
 
+import com.sesac.fmmall.DTO.CategoryDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,4 +28,9 @@ public class Category {
 
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
+
+    public void modify(String categoryName)
+    {
+        this.name = categoryName;
+    }
 }
