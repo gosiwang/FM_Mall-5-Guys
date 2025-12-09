@@ -38,5 +38,9 @@ public class Review {
     @JoinColumn(name = "order_item_id")
     private OrderItem orderItem;
 
+    public void modify(String content, Double rating){
+        this.reviewContent = content;
+        this.reviewRating = rating;
+    }
 
 }
