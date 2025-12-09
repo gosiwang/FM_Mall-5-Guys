@@ -11,7 +11,6 @@ import com.sesac.fmmall.Repository.BrandRepository;
 import com.sesac.fmmall.Repository.CategoryRepository;
 import com.sesac.fmmall.Repository.ProductRepository;
 import com.sesac.fmmall.Repository.RowCategoryRepository;
-import com.sesac.fmmall.Security.JwtAuthorizationFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -49,9 +48,6 @@ class ProductServiceTest {
     // SecurityConfig 때문에 필요한 MockBean 들
     @MockBean
     private PasswordEncoder passwordEncoder;
-
-    @MockBean
-    private JwtAuthorizationFilter jwtAuthorizationFilter;
 
     // ⚠ 핵심: ModelMapper도 MockBean으로 등록 (OrderService, ProductService 둘 다 이걸 주입받음)
     @MockBean
