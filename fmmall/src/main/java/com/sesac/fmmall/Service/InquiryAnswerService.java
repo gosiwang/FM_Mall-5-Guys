@@ -152,5 +152,14 @@ public class InquiryAnswerService {
         inquiryAnswerRepository.deleteById(inquiryAnswerId);
     }
 
+    @Transactional
+    public void deleteAllInquiryAnswer() {
+        inquiryAnswerRepository.deleteAll();
+
+        inquiryAnswerRepository.flush();
+
+        inquiryAnswerRepository.resetAutoIncrement();
+    }
+
 
 }

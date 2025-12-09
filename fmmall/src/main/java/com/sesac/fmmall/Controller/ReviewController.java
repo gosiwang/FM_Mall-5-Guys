@@ -34,12 +34,14 @@ public class ReviewController {
         return ResponseEntity.ok(resultReview);
     }
 
+
     @Operation(summary = "사용자별 리뷰 목록 조회", description = "특정 사용자가 작성한 모든 리뷰를 최신순으로 페이징하여 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "리뷰 목록 조회 성공"),
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
     })
-    @GetMapping("/findAll/user/{userId}/{curPage}")
+    @GetMapping("/findByUser/{userId}/{curPage}")
+
     public ResponseEntity<Page<ReviewResponseDTO>> findReviewByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
         Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByUserIdSortedUpdatedAt(userId, curPage);
         return ResponseEntity.ok(resultInquiryAnswer);
@@ -50,7 +52,7 @@ public class ReviewController {
             @ApiResponse(responseCode = "200", description = "리뷰 목록 조회 성공"),
             @ApiResponse(responseCode = "404", description = "주문 상품을 찾을 수 없음")
     })
-    @GetMapping("/findAll/orderItem/{orderItemId}/{curPage}")
+    @GetMapping("/findByOrderItem/{orderItemId}/{curPage}")
     public ResponseEntity<Page<ReviewResponseDTO>> findReviewByOrderItemIdSortedUpdatedAt(@PathVariable int orderItemId, @PathVariable int curPage) {
         Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByOrderItemIdSortedUpdatedAt(orderItemId, curPage);
         return ResponseEntity.ok(resultInquiryAnswer);
@@ -88,6 +90,12 @@ public class ReviewController {
     @DeleteMapping("/delete/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable int reviewId) {
         reviewService.deleteReview(reviewId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<Void> deleteAllReview() {
+        reviewService.deleteAllReview();
         return ResponseEntity.noContent().build();
     }
 }
