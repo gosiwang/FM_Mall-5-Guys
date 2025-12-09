@@ -58,17 +58,11 @@ public class InquiryAnswerController extends BaseController {
     }
 
     /* 5. 문의 답변 삭제 */
-    @DeleteMapping("/delete/{inquiryAnswerId}")
+    @DeleteMapping("/delete/{inquiryAnswerId} ")
     public ResponseEntity<Void> deleteInquiryAnswer(@PathVariable int inquiryAnswerId) {
 
         inquiryAnswerService.deleteInquiryAnswer(inquiryAnswerId);
 
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/deleteAll")
-    public ResponseEntity<Void> deleteAllInquiryAnswer() {
-        inquiryAnswerService.deleteAllInquiryAnswer();
         return ResponseEntity.noContent().build();
     }
 }
