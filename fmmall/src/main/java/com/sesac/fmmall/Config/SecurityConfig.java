@@ -30,13 +30,17 @@ public class  SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 추가
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(form -> form.disable())
                 .httpBasic(b -> b.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/User/login", "/User/signup").permitAll()
+                        .requestMatchers("/Product/**").permitAll()
+                        .requestMatchers("/ColumnCategory/**").permitAll()
+                        .requestMatchers("/RowCategory/**").permitAll()
+                        .requestMatchers("/Brand/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )

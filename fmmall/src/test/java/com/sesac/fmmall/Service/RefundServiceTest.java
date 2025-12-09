@@ -12,7 +12,6 @@ import com.sesac.fmmall.DTO.Refund.RefundItemResponse;
 import com.sesac.fmmall.DTO.Refund.RefundResponse;
 import com.sesac.fmmall.Entity.*;
 import com.sesac.fmmall.Repository.*;
-import com.sesac.fmmall.Security.JwtAuthorizationFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

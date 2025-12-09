@@ -8,7 +8,6 @@ import com.sesac.fmmall.DTO.Order.OrderItemCreateRequest;
 import com.sesac.fmmall.DTO.Order.OrderResponse;
 import com.sesac.fmmall.Entity.*;
 import com.sesac.fmmall.Repository.*;
-import com.sesac.fmmall.Security.JwtAuthorizationFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
