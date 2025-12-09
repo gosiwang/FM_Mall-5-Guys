@@ -115,13 +115,23 @@ public class InquiryService {
 
     /* 5. 문의 삭제 */
     @Transactional
-    public void deleteInquiry(int inquiryId) {
+    public void deleteInquiry(int inquiryId, int userId) {
+        Inquiry inquiry = inquiryRepository.findById(inquiryId)
+                .orElseThrow(() -> new IllegalArgumentException("삭제할 문의가 존재하지 않습니다."));
 
-        if (!inquiryRepository.existsById(inquiryId)) {
-            throw new IllegalArgumentException("삭제할 문의가 존재하지 않습니다.");
-
+        if (inquiry.getUser().getUserId() != userId) {
+            throw new IllegalArgumentException("삭제 권한이 없습니다. (작성자 불일치)");
         }
 
+        inquiryRepository.delete(inquiry);
+    }
+
+    // 관리자용 삭제 메소드 (ID만으로 삭제)
+    @Transactional
+    public void deleteInquiry(int inquiryId) {
+        if (!inquiryRepository.existsById(inquiryId)) {
+            throw new IllegalArgumentException("삭제할 문의가 존재하지 않습니다.");
+        }
         inquiryRepository.deleteById(inquiryId);
     }
 
@@ -133,6 +143,4 @@ public class InquiryService {
 
         inquiryRepository.resetAutoIncrement();
     }
-
-
 }

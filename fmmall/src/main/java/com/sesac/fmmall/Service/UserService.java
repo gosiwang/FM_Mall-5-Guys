@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +49,14 @@ public class UserService {
         return new UserResponseDto(user);
     }
 
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(UserResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
     public UserResponseDto updateUser(Integer userId, UserUpdateRequestDto dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -83,6 +93,14 @@ public class UserService {
         if (!orders.isEmpty()) {
             throw new IllegalStateException("주문 내역이 있는 경우 탈퇴할 수 없습니다. 고객센터에 문의해주세요.");
         }*/
+
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    public void adminDeleteUser(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         userRepository.delete(user);
     }
