@@ -19,7 +19,7 @@ public class WishListController extends BaseController {
     private final WishListService wishListService;
 
     /* 1. 특정 아이디로 조회 */
-    @GetMapping("/find/{wishListId}")
+    @GetMapping("/findOne/{wishListId}")
     public ResponseEntity<WishListResponseDTO> findWishListById(@PathVariable int wishListId) {
         WishListResponseDTO resultWishList = wishListService.findWishListByWishListId(wishListId);
 

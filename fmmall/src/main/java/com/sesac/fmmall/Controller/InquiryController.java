@@ -18,7 +18,7 @@ public class InquiryController extends BaseController {
     private final InquiryService inquiryService;
 
     /* 1. 특정 아이디로 조회 */
-    @GetMapping("/find/{inquiryId}")
+    @GetMapping("/findOne/{inquiryId}")
     public ResponseEntity<InquiryResponseDTO> findInquiryById(@PathVariable int inquiryId) {
         InquiryResponseDTO resultInquiry = inquiryService.findInquiryByInquiryId(inquiryId);
 
