@@ -13,6 +13,7 @@ import com.sesac.fmmall.Repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  * - 주문 조회 (전체 / 단건 / 상품 기준)
  * - 주문 취소
  */
+
 @Service
 @RequiredArgsConstructor
 public class OrderService {
