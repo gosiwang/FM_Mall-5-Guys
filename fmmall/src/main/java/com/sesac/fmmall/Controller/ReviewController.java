@@ -33,14 +33,14 @@ public class ReviewController {
 //        // 상태 코드 200(ok)와 함께 JSON 반환
 //        return ResponseEntity.ok(resultReview);
 //    }
-    @GetMapping("/findAll/user/{userId}/{curPage}")
+    @GetMapping("/findByUser/{userId}/{curPage}")
     public ResponseEntity<Page<ReviewResponseDTO>> findReviewByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
         Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByUserIdSortedUpdatedAt(userId, curPage);
         // 상태 코드 200(ok)와 함께 JSON 반환
         return ResponseEntity.ok(resultInquiryAnswer);
     }
 
-    @GetMapping("/findAll/orderItem/{orderItemId}/{curPage}")
+    @GetMapping("/findByOrderItem/{orderItemId}/{curPage}")
     public ResponseEntity<Page<ReviewResponseDTO>> findReviewByOrderItemIdSortedUpdatedAt(@PathVariable int orderItemId, @PathVariable int curPage) {
         Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByOrderItemIdSortedUpdatedAt(orderItemId, curPage);
         // 상태 코드 200(ok)와 함께 JSON 반환

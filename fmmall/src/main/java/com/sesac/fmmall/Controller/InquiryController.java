@@ -36,14 +36,14 @@ public class InquiryController {
 //        return ResponseEntity.ok(resultInquiry);
 //    }
     /* 2. 최신순 정렬(페이징) -> 유저, 상품 */
-    @GetMapping("/findAll/user/{userId}/{curPage}")
+    @GetMapping("/findByUser/{userId}/{curPage}")
     public ResponseEntity<Page<InquiryResponseDTO>> findInquiryByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
         Page<InquiryResponseDTO> resultInquiryAnswer = inquiryService.findInquiryByUserIdSortedUpdatedAt(userId, curPage);
         // 상태 코드 200(ok)와 함께 JSON 반환
         return ResponseEntity.ok(resultInquiryAnswer);
     }
 
-    @GetMapping("/findAll/product/{productId}/{curPage}")
+    @GetMapping("/findByProduct/{productId}/{curPage}")
     public ResponseEntity<Page<InquiryResponseDTO>> findInquiryByProductIdSortedUpdatedAt(@PathVariable int productId, @PathVariable int curPage) {
         Page<InquiryResponseDTO> resultInquiryAnswer = inquiryService.findInquiryByProductIdSortedUpdatedAt(productId, curPage);
         // 상태 코드 200(ok)와 함께 JSON 반환

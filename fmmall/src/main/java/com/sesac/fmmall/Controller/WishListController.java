@@ -25,7 +25,7 @@ public class WishListController {
     }
 
 //    /* 2. 최신 생성순 정렬(페이징) -> 유저별 */
-    @GetMapping("/findAll/user/{userId}/{curPage}")
+    @GetMapping("/findByUser/{userId}/{curPage}")
     public ResponseEntity<Page<WishListResponseDTO>> findWishListByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
         Page<WishListResponseDTO> resultInquiryAnswer = wishListService.findWishListByUserIdSortedCreatedAt(userId, curPage);
         // 상태 코드 200(ok)와 함께 JSON 반환
