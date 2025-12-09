@@ -55,7 +55,8 @@ public class ReviewService {
         }
 
         // 리포지토리 호출 (주문상품 ID로 필터링 + 페이징/정렬 적용)
-        Review foundReview = reviewRepository.findByOrderItem_OrderItemId(orderItemId);
+        Review foundReview = reviewRepository.findByOrderItem_OrderItemId(orderItemId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 리뷰입니다."));
 
         // Entity -> DTO 변환 후 반환
         return ReviewResponseDTO.from(foundReview);
@@ -69,6 +70,12 @@ public class ReviewService {
         OrderItem orderItem = orderItemRepository.findById(requestDTO.getOrderItemId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
+        reviewRepository.findByOrderItem_OrderItemId(orderItem.getOrderItemId())
+                .ifPresent(review -> {
+                    // 이미 존재한다면 예외를 던집니다.
+                    throw new IllegalArgumentException("이미 해당 주문 상품에 대한 리뷰를 작성했습니다.");
+                });
+
         Order order = orderItem.getOrder();
         if (order == null || order.getUser().getUserId() != writerId) {
             throw new IllegalArgumentException("본인이 주문한 상품에 대해서만 리뷰를 작성할 수 있습니다.");
@@ -77,6 +84,7 @@ public class ReviewService {
         // DTO -> Entity 변환 (builder 패턴 사용)
         Review newReview = Review.builder()
                 .reviewContent(requestDTO.getReviewContent())
+                .reviewRating(requestDTO.getReviewRating())
                 .user(user)
                 .orderItem(orderItem)
                 .build();
