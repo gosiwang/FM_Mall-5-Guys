@@ -1,5 +1,6 @@
 package com.sesac.fmmall.Service;
 
+import com.sesac.fmmall.Constant.ProductStatus;
 import com.sesac.fmmall.Constant.RefundReasonCode;
 import com.sesac.fmmall.Constant.RefundStatus;
 import com.sesac.fmmall.Constant.RefundType;
@@ -40,18 +41,33 @@ class RefundServiceTest {
 
     @Autowired
     private OrderRepository orderRepository;
+
     @Autowired
     private OrderItemRepository orderItemRepository;
+
     @Autowired
     private PaymentRepository paymentRepository;
+
     @Autowired
     private RefundRepository refundRepository;
+
     @Autowired
     private RefundItemRepository refundItemRepository;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private BrandRepository brandRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private RowCategoryRepository rowCategoryRepository;
 
     // SecurityConfig 때문에 필요한 MockBean 들
     @MockBean
@@ -93,16 +109,40 @@ class RefundServiceTest {
                 .build();
         admin = userRepository.save(admin);
 
-        // === 2) 상품 생성 ===
+        // === 2) 브랜드 / 카테고리 / 하위 카테고리 생성 ===
+        Brand brand = Brand.builder()
+                .name("테스트 브랜드")
+                .build();
+        brand = brandRepository.save(brand);
+
+        Category category = Category.builder()
+                .name("TV/가전")
+                .build();
+        category = categoryRepository.save(category);
+
+        RowCategory rowCategory = RowCategory.builder()
+                .name("OLED TV")
+                .category(category)
+                .build();
+        rowCategory = rowCategoryRepository.save(rowCategory);
+
+        // === 3) 상품 생성 (Product 엔티티 NOT NULL 필드들 모두 채우기) ===
         product = Product.builder()
-                .productId(0)         // @GeneratedValue지만 0 넣어도 무시 / 혹은 null 가능
                 .name("테스트 상품")
                 .price(10_000)
                 .stockQuantity(100)
+                .capacity("용량")
+                .description("환불 테스트용 상품")
+                .isInstallationRequired("Y")
+                .productStatus(ProductStatus.ACTIVE)
+                .modelName("REFUND-TEST-001")
+                .brand(brand)
+                .category(category)
+                .rowCategory(rowCategory)
                 .build();
         product = productRepository.save(product);
 
-        // === 3) 주문 + 주문아이템 + 결제 생성 ===
+        // === 4) 주문 + 주문아이템 + 결제 생성 ===
         order = Order.builder()
                 .receiverName("수령인")
                 .receiverPhone("010-1234-5678")
@@ -137,7 +177,7 @@ class RefundServiceTest {
         payment = paymentRepository.save(payment);
         order.setPayment(payment);
 
-        // === 4) ModelMapper Mock -> 실제 매핑 위임 설정 ===
+        // === 5) ModelMapper Mock -> 실제 매핑 위임 설정 ===
         given(modelMapper.map(any(Refund.class), eq(RefundResponse.class)))
                 .willAnswer(invocation -> {
                     Refund source = invocation.getArgument(0);
@@ -198,8 +238,22 @@ class RefundServiceTest {
         assertThat(response.getItems().get(0).getRefundQuantity()).isEqualTo(1);
 
         // 실제 DB에 Refund / RefundItem 이 생성됐는지 확인
-        assertThat(refundRepository.findAll()).hasSize(1);
-        assertThat(refundItemRepository.findAll()).hasSize(1);
+        // 이번에 생성된 refundId 기준으로만 검증
+        Refund savedRefund = refundRepository.findById(response.getRefundId())
+                .orElseThrow(() -> new AssertionError("생성된 Refund가 DB에 존재하지 않습니다."));
+
+        assertThat(savedRefund.getTotalAmount()).isEqualTo(response.getTotalAmount());
+        assertThat(savedRefund.getOrder().getOrderId()).isEqualTo(order.getOrderId());
+        assertThat(savedRefund.getPayment().getPaymentId()).isEqualTo(payment.getPaymentId());
+
+// 이 Refund에 연결된 RefundItem만 필터링해서 검증
+        List<RefundItem> itemsForThisRefund = refundItemRepository.findAll().stream()
+                .filter(ri -> ri.getRefund().getRefundId() == response.getRefundId())
+                .toList();
+
+        assertThat(itemsForThisRefund).hasSize(1);
+        assertThat(itemsForThisRefund.get(0).getRefundQuantity()).isEqualTo(1);
+
     }
 
     @Test
