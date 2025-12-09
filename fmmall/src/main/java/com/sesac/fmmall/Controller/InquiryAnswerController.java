@@ -1,15 +1,17 @@
 package com.sesac.fmmall.Controller;
 
-import com.sesac.fmmall.DTO.Inquiry.InquiryAnswerModifyRequestDTO;
-import com.sesac.fmmall.DTO.Inquiry.InquiryAnswerRequestDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryAnswerResponseDTO;
 import com.sesac.fmmall.Service.InquiryAnswerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "문의 답변 API")
 @RestController
 @RequestMapping("/InquiryAnswer")
 @RequiredArgsConstructor
@@ -17,58 +19,28 @@ public class InquiryAnswerController extends BaseController {
 
     private final InquiryAnswerService inquiryAnswerService;
 
-    /* 1. 특정 아이디로 조회 */
+    @Operation(summary = "문의 답변 조회", description = "문의 답변 ID로 특정 답변을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "답변 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "답변을 찾을 수 없음")
+    })
     @GetMapping("/findOne/{inquiryAnswerId}")
     public ResponseEntity<InquiryAnswerResponseDTO> findInquiryAnswerById(@PathVariable int inquiryAnswerId) {
         InquiryAnswerResponseDTO resultInquiryAnswer = inquiryAnswerService.findInquiryAnswerByInquiryAnswerId(inquiryAnswerId);
         return ResponseEntity.ok(resultInquiryAnswer);
     }
 
-    /* 2. 최신순 정렬(페이징) -> 유저, 문의, 자기자신 */
-    @GetMapping("/findByUser/{userId}")
-    public ResponseEntity<Page<InquiryAnswerResponseDTO>> findInquiryAnswerByUserIdSortedUpdatedAt(@PathVariable int userId, @RequestParam(defaultValue = "1") int curPage) {
-        Page<InquiryAnswerResponseDTO> resultInquiryAnswer = inquiryAnswerService.findInquiryAnswerByUserIdSortedUpdatedAt(userId, curPage);
-        return ResponseEntity.ok(resultInquiryAnswer);
-    }
-
+    @Operation(summary = "문의별 답변 목록 조회", description = "특정 상품 문의에 달린 모든 답변을 최신순으로 페이징하여 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "답변 목록 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "문의를 찾을 수 없음")
+    })
     @GetMapping("/findByInquiry/{inquiryId}")
-    public ResponseEntity<Page<InquiryAnswerResponseDTO>> findInquiryAnswerByInquiryIdSortedUpdatedAt(@PathVariable int inquiryId, @RequestParam(defaultValue = "1") int curPage) {
+    public ResponseEntity<Page<InquiryAnswerResponseDTO>> findInquiryAnswerByInquiryId(
+            @PathVariable int inquiryId,
+            @RequestParam(defaultValue = "1") int curPage
+    ) {
         Page<InquiryAnswerResponseDTO> resultInquiryAnswer = inquiryAnswerService.findInquiryAnswerByInquiryIdSortedUpdatedAt(inquiryId, curPage);
         return ResponseEntity.ok(resultInquiryAnswer);
-    }
-
-    @GetMapping("/findByUser/me")
-    public ResponseEntity<Page<InquiryAnswerResponseDTO>> findInquiryAnswerByUserIdSortedUpdatedAt(@RequestParam(defaultValue = "1") int curPage) {
-        Page<InquiryAnswerResponseDTO> resultInquiryAnswer = inquiryAnswerService.findInquiryAnswerByUserIdSortedUpdatedAt(getCurrentUserId(), curPage);
-        return ResponseEntity.ok(resultInquiryAnswer);
-    }
-
-    /* 3. 문의 답변 등록 */
-    @PostMapping("/insert")
-    public ResponseEntity<InquiryAnswerResponseDTO> insertInquiryAnswer(@RequestBody InquiryAnswerRequestDTO requestDTO) {
-        InquiryAnswerResponseDTO newInquiryAnswer = inquiryAnswerService.insertInquiryAnswer(getCurrentUserId(), requestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newInquiryAnswer);
-    }
-
-    /* 4. 문의 답변 수정 */
-    @PutMapping("/modify/{inquiryAnswerId}")
-    public ResponseEntity<InquiryAnswerResponseDTO> modifyInquiryAnswer(@PathVariable int inquiryAnswerId, @RequestBody InquiryAnswerModifyRequestDTO requestDTO) {
-        InquiryAnswerResponseDTO updatedInquiryAnswer = inquiryAnswerService.modifyInquiryAnswerContent(inquiryAnswerId, getCurrentUserId(), requestDTO);
-        return ResponseEntity.ok(updatedInquiryAnswer);
-    }
-
-    /* 5. 문의 답변 삭제 */
-    @DeleteMapping("/delete/{inquiryAnswerId} ")
-    public ResponseEntity<Void> deleteInquiryAnswer(@PathVariable int inquiryAnswerId) {
-
-        inquiryAnswerService.deleteInquiryAnswer(inquiryAnswerId);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/deleteAll")
-    public ResponseEntity<Void> deleteAllInquiryAnswer() {
-        inquiryAnswerService.deleteAllInquiryAnswer();
-        return ResponseEntity.noContent().build();
     }
 }

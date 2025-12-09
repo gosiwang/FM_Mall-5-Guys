@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Payment", description = "결제 수단 API")
+@Tag(name = "결제 수단 API")
 @RestController
 @RequestMapping("/Payment")
 @RequiredArgsConstructor
-public class PaymentController {
+public class PaymentController extends BaseController {
 
     private final PaymentMethodService paymentMethodService;
 
@@ -29,11 +29,10 @@ public class PaymentController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (예: 입력값 유효성 검사 실패)"),
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
     })
-    @PostMapping("/insert/{userId}")
+    @PostMapping("/insert")
     public ResponseEntity<PaymentMethodResponseDto> insert(
-            @PathVariable Integer userId,
             @Valid @RequestBody PaymentMethodSaveRequestDto dto) {
-        PaymentMethodResponseDto response = paymentMethodService.addPaymentMethod(userId, dto);
+        PaymentMethodResponseDto response = paymentMethodService.addPaymentMethod(getCurrentUserId(), dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -42,9 +41,9 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "결제 수단 목록 조회 성공"),
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
     })
-    @GetMapping("/findAll/{userId}")
-    public ResponseEntity<List<PaymentMethodResponseDto>> findAll(@PathVariable Integer userId) {
-        List<PaymentMethodResponseDto> responses = paymentMethodService.getPaymentMethodsByUserId(userId);
+    @GetMapping("/findAll")
+    public ResponseEntity<List<PaymentMethodResponseDto>> findAll() {
+        List<PaymentMethodResponseDto> responses = paymentMethodService.getPaymentMethodsByUserId(getCurrentUserId());
         return ResponseEntity.ok(responses);
     }
 
@@ -54,11 +53,10 @@ public class PaymentController {
             @ApiResponse(responseCode = "403", description = "해당 결제 수단에 대한 접근 권한 없음"),
             @ApiResponse(responseCode = "404", description = "결제 수단 또는 사용자를 찾을 수 없음")
     })
-    @GetMapping("/findOne/{paymentMethodId}/{userId}")
+    @GetMapping("/findOne/{paymentMethodId}")
     public ResponseEntity<PaymentMethodResponseDto> findOne(
-            @PathVariable Integer paymentMethodId,
-            @PathVariable Integer userId) {
-        PaymentMethodResponseDto response = paymentMethodService.getPaymentMethodById(paymentMethodId, userId);
+            @PathVariable Integer paymentMethodId) {
+        PaymentMethodResponseDto response = paymentMethodService.getPaymentMethodById(paymentMethodId, getCurrentUserId());
         return ResponseEntity.ok(response);
     }
 
@@ -69,12 +67,11 @@ public class PaymentController {
             @ApiResponse(responseCode = "403", description = "해당 결제 수단에 대한 접근 권한 없음"),
             @ApiResponse(responseCode = "404", description = "결제 수단 또는 사용자를 찾을 수 없음")
     })
-    @PutMapping("/modify/{paymentMethodId}/{userId}")
+    @PutMapping("/modify/{paymentMethodId}")
     public ResponseEntity<PaymentMethodResponseDto> modify(
             @PathVariable Integer paymentMethodId,
-            @PathVariable Integer userId,
             @Valid @RequestBody PaymentMethodSaveRequestDto dto) {
-        PaymentMethodResponseDto response = paymentMethodService.updatePaymentMethod(paymentMethodId, userId, dto);
+        PaymentMethodResponseDto response = paymentMethodService.updatePaymentMethod(paymentMethodId, getCurrentUserId(), dto);
         return ResponseEntity.ok(response);
     }
 
@@ -84,11 +81,10 @@ public class PaymentController {
             @ApiResponse(responseCode = "403", description = "해당 결제 수단에 대한 접근 권한 없음"),
             @ApiResponse(responseCode = "404", description = "결제 수단 또는 사용자를 찾을 수 없음")
     })
-    @DeleteMapping("/delete/{paymentMethodId}/{userId}")
+    @DeleteMapping("/delete/{paymentMethodId}")
     public ResponseEntity<Void> delete(
-            @PathVariable Integer paymentMethodId,
-            @PathVariable Integer userId) {
-        paymentMethodService.deletePaymentMethod(paymentMethodId, userId);
+            @PathVariable Integer paymentMethodId) {
+        paymentMethodService.deletePaymentMethod(paymentMethodId, getCurrentUserId());
         return ResponseEntity.noContent().build();
     }
 }

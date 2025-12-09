@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Cart", description = "장바구니 API")
+@Tag(name = "장바구니 API")
 @RestController
 @RequestMapping("/Cart")
 @RequiredArgsConstructor

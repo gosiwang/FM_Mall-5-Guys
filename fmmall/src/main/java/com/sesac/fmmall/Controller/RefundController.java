@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Refund", description = "환불 API")
+@Tag(name = "환불 API")
 @RestController
 @RequestMapping("/Refund")
 @RequiredArgsConstructor

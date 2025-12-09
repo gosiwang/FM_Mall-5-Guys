@@ -117,13 +117,23 @@ public class ReviewService {
 
     /* 5. 리뷰 삭제 */
     @Transactional
-    public void deleteReview(int reviewId) {
+    public void deleteReview(int reviewId, int userId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("삭제할 리뷰가 존재하지 않습니다."));
 
-        if (!reviewRepository.existsById(reviewId)) {
-            throw new IllegalArgumentException("삭제할 리뷰가 존재하지 않습니다.");
-
+        if (review.getUser().getUserId() != userId) {
+            throw new IllegalArgumentException("삭제 권한이 없습니다. (작성자 불일치)");
         }
 
+        reviewRepository.delete(review);
+    }
+    
+    // 관리자용 삭제 메소드 (ID만으로 삭제)
+    @Transactional
+    public void deleteReview(int reviewId) {
+        if (!reviewRepository.existsById(reviewId)) {
+            throw new IllegalArgumentException("삭제할 리뷰가 존재하지 않습니다.");
+        }
         reviewRepository.deleteById(reviewId);
     }
 
@@ -135,6 +145,4 @@ public class ReviewService {
 
         reviewRepository.resetAutoIncrement();
     }
-
-
 }

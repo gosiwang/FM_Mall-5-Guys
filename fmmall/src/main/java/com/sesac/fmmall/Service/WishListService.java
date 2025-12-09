@@ -28,14 +28,18 @@ public class WishListService {
     private final ProductRepository productRepository;
 
     /* 1. 위시리스트 코드로 상세 조회 */
-    public WishListResponseDTO findWishListByWishListId(int wishListId) {
-        WishList foundWishList = wishListRepository.findById(wishListId).orElseThrow(
-                () -> new IllegalArgumentException("해당 ID를 가진 위시리스트가 존재하지 않습니다."));
+    public WishListResponseDTO findWishListByWishListId(int wishListId, int userId) {
+        WishList foundWishList = wishListRepository.findById(wishListId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 위시리스트가 존재하지 않습니다."));
+
+        if (foundWishList.getUser().getUserId() != userId) {
+            throw new IllegalArgumentException("조회 권한이 없습니다.");
+        }
 
         return WishListResponseDTO.from(foundWishList);
     }
 
-    /* 2. 위시리스트 전체 조회 */
+    /* 2. 위시리스트 전체 조회 (관리자용) */
     public List<WishListResponseDTO> findAllWishList() {
         List<WishList> foundWishListList = wishListRepository.findAll();
 
@@ -64,40 +68,20 @@ public class WishListService {
         return wishListList.map(WishListResponseDTO::from);
     }
 
-    /* 3. 위시리스트 등록 */
-    @Transactional
-    public WishListResponseDTO insertWishList(int currentUserId, WishListRequestDTO requestDTO) {
-        User user = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-        Product product = productRepository.findById(requestDTO.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
-
-        // DTO -> Entity 변환 (builder 패턴 사용)
-        WishList newWishList = WishList.builder()
-                .user(user)
-                .product(product)
-                .build();
-
-        // 내부적으로 EntityManager.persist() 호출되어 영속성 컨텍스트로 들어간다.
-        WishList savedWishList = wishListRepository.save(newWishList);
-
-        // 저장 후, 생성된 Entity를 다시 DTO로 변환하여 반환
-        return WishListResponseDTO.from(savedWishList);
-    }
-
     /* 4. 위시리스트 삭제 */
     @Transactional
-    public void deleteWishList(int wishListId) {
+    public void deleteWishList(int wishListId, int userId) {
+        WishList wishList = wishListRepository.findById(wishListId)
+                .orElseThrow(() -> new IllegalArgumentException("삭제할 위시리스트가 존재하지 않습니다."));
 
-        if (!wishListRepository.existsById(wishListId)) {
-            throw new IllegalArgumentException("삭제할 위시리스트가 존재하지 않습니다.");
-
+        if (wishList.getUser().getUserId() != userId) {
+            throw new IllegalArgumentException("삭제 권한이 없습니다.");
         }
 
-        wishListRepository.deleteById(wishListId);
+        wishListRepository.delete(wishList);
     }
 
-    /* 5. 위시리스트 토클 형식. 사실상 삽입, 삭제를 담당하기에 위에 것들은 필요없음. */
+    /* 5. 위시리스트 토글 형식. 사실상 삽입, 삭제를 담당하기에 위에 것들은 필요없음. */
     @Transactional
     public WishListResponseDTO toggleWishlist(int currentUserId, WishListRequestDTO requestDTO) {
         User user = userRepository.findById(currentUserId)
@@ -131,6 +115,4 @@ public class WishListService {
 
         wishListRepository.resetAutoIncrement();
     }
-
-
 }

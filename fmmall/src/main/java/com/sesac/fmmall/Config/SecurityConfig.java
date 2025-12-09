@@ -23,7 +23,7 @@ import java.util.Arrays;
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class  SecurityConfig {
 
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
