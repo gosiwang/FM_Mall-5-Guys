@@ -17,7 +17,6 @@ import java.util.List;
 public class BrandController {
 
     private final BrandService brandService;
-
     /* 브랜드 정보 등록 */
     @PostMapping("/insert")
     public ResponseEntity<BrandDTO> insertBrand(@RequestBody @Valid BrandDTO brandDTO) {
