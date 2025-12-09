@@ -1,13 +1,11 @@
 package com.sesac.fmmall.Controller;
 
-import com.sesac.fmmall.DTO.Inquiry.InquiryAnswerResponseDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryRequestDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryResponseDTO;
 import com.sesac.fmmall.Service.InquiryService;
 import com.sesac.fmmall.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 public class InquiryController {
 
     private final InquiryService inquiryService;
-    private final UserService userService;
 
     /* 1. 특정 아이디로 조회 */
     @GetMapping("/find/{inquiryId}")
@@ -28,13 +25,6 @@ public class InquiryController {
         return ResponseEntity.ok(resultInquiry);
     }
 
-//    /* 2. 최신순 정렬(페이징) -> 상품, 유저별로 변경해야함. */
-//    @GetMapping("/findAll")
-//    public ResponseEntity<Page<InquiryResponseDTO>> findAllByOrderByUpdatedAt(Pageable pageable) {
-//        Page<InquiryResponseDTO> resultInquiry = inquiryService.findAllSortedUpdatedAt(pageable);
-//        // 상태 코드 200(ok)와 함께 JSON 반환
-//        return ResponseEntity.ok(resultInquiry);
-//    }
     /* 2. 최신순 정렬(페이징) -> 유저, 상품 */
     @GetMapping("/findByUser/{userId}/{curPage}")
     public ResponseEntity<Page<InquiryResponseDTO>> findInquiryByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
