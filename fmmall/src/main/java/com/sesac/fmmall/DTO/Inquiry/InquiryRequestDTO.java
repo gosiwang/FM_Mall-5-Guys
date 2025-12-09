@@ -12,6 +12,5 @@ import lombok.ToString;
 @NoArgsConstructor
 public class InquiryRequestDTO {
     private String inquiryContent;
-    private int userId;
     private int productId;
 }
