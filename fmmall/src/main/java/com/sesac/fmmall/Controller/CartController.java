@@ -27,7 +27,7 @@ public class CartController extends BaseController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (예: 상품 ID 또는 수량 누락)"),
             @ApiResponse(responseCode = "404", description = "사용자 또는 상품을 찾을 수 없음")
     })
-    @PostMapping("/insert/")
+    @PostMapping("/insert")
     public ResponseEntity<CartResponseDTO> addCartItem(
             @RequestBody CartItemCreateRequestDTO requestDTO
     ) {
