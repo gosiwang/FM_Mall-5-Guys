@@ -98,7 +98,7 @@ class OrderServiceTest {
         category = categoryRepository.save(category);
 
         RowCategory rowCategory = RowCategory.builder()
-                .name("OLED TV")   // 네 RowCategory 엔티티 필드명이 다르면 여기만 수정하면 됨
+                .name("OLED TV")
                 .category(category)
                 .build();
         rowCategory = rowCategoryRepository.save(rowCategory);
@@ -120,14 +120,14 @@ class OrderServiceTest {
                 .build();
         product = productRepository.save(product);
 
-        // 4) 배송지(Address) - Address 엔티티 기준으로 NOT NULL 다 채움
+        // 4) 배송지(Address)
         address = Address.builder()
                 .receiverName("테스트 수령인")
                 .receiverPhone("010-9999-8888")
                 .zipcode("12345")
                 .address1("서울시 강남구 테헤란로 123")
                 .address2("101동 1001호")
-                .isDefault("Y")              // ★ String 타입("Y"/"N") 으로 변경된 부분
+                .isDefault("Y")              // String("Y"/"N") 기준
                 .user(user)
                 .build();
         address = addressRepository.save(address);
@@ -137,13 +137,13 @@ class OrderServiceTest {
         cart = cartRepository.save(cart);
 
         cartItem = CartItem.createCartItem(product, 2);  // 수량 2개
-        cart.addCartItem(cartItem);                      // Cart <-> CartItem 연관관계
+        cart.addCartItem(cartItem);                      // 양방향 연관관계 편의 메서드
         cart = cartRepository.save(cart);                // cascade 로 cartItem 함께 저장
 
         // 6) 결제수단(PaymentMethod)
         paymentMethod = PaymentMethod.builder()
                 .cardCompany("HyundaiCard")
-                .maskedCardNumber("****-****-****-1234")    // ★ NOT NULL 컬럼
+                .maskedCardNumber("****-****-****-1234")
                 .isDefault(true)
                 .user(user)
                 .build();
@@ -162,20 +162,20 @@ class OrderServiceTest {
 
         // 1) 요청 DTO 준비
         CartOrderCreateRequest request = CartOrderCreateRequest.builder()
-                .addressId(address.getAddressId())                      // 명시적 배송지
-                .paymentMethodId(paymentMethod.getPaymentMethodId())    // 사용할 결제수단
+                .addressId(address.getAddressId())
+                .paymentMethodId(paymentMethod.getPaymentMethodId())
                 .build();
 
         // 2) 서비스 호출
-        // ⚠️ 네 OrderService 메서드 시그니처에 맞게 수정
-        // 예: public OrderResponse createOrderFromCart(int userId, CartOrderCreateRequest request)
+        // 시그니처 예시: public OrderResponse createOrderFromCart(int userId, CartOrderCreateRequest request)
         OrderResponse response = orderService.createOrderFromCart(user.getUserId(), request);
 
         // 3) 반환 DTO 검증
         assertThat(response).isNotNull();
         assertThat(response.getOrderId()).isGreaterThan(0);
         assertThat(response.getReceiverName()).isEqualTo(address.getReceiverName());
-        assertThat(response.getTotalPrice()).isEqualTo(product.getPrice() * cartItem.getCartItemQuantity());
+        assertThat(response.getTotalPrice())
+                .isEqualTo(product.getPrice() * cartItem.getCartItemQuantity());
 
         // 4) 실제 DB에 저장된 Order / OrderItem / Payment 검증
         Order savedOrder = orderRepository.findById(response.getOrderId())
@@ -222,17 +222,19 @@ class OrderServiceTest {
                 .build();
 
         // 3) 서비스 호출
-        // ⚠️ 네 OrderService 메서드 이름에 맞게 수정
-        // 예: public OrderResponse createOrder(int userId, OrderCreateRequest request)
+        // 시그니처 예시: public OrderResponse createOrder(int userId, OrderCreateRequest request)
         OrderResponse response = orderService.createOrder(user.getUserId(), request);
 
         // 4) 응답 DTO 검증
         assertThat(response).isNotNull();
         assertThat(response.getOrderId()).isGreaterThan(0);
-        assertThat(response.getTotalPrice()).isEqualTo(product.getPrice() * orderQuantity);
+        assertThat(response.getTotalPrice())
+                .isEqualTo(product.getPrice() * orderQuantity);
         assertThat(response.getItems()).hasSize(1);
-        assertThat(response.getItems().get(0).getProductId()).isEqualTo(product.getProductId());
-        assertThat(response.getItems().get(0).getQuantity()).isEqualTo(orderQuantity);
+        assertThat(response.getItems().get(0).getProductId())
+                .isEqualTo(product.getProductId());
+        assertThat(response.getItems().get(0).getQuantity())
+                .isEqualTo(orderQuantity);
 
         // 5) 실제 DB 검증
         Order savedOrder = orderRepository.findById(response.getOrderId())
