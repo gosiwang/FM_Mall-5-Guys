@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "관리자용 사용자 관리 API")
+@Tag(name = "[관리자] 사용자 관리 API")
 @RestController
 @RequestMapping("/Admin/User")
 @RequiredArgsConstructor

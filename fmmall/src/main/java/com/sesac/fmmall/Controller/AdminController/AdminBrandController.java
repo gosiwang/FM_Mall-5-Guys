@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "관리자용 브랜드 관리 API")
+@Tag(name = "[관리자] 브랜드 관리 API")
 @RestController
 @RequestMapping("/Admin/Brand")
 @RequiredArgsConstructor

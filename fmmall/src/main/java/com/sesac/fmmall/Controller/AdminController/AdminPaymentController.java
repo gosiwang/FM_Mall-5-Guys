@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "관리자용 결제 수단 API")
+@Tag(name = "[관리자] 결제 수단 관리 API")
 @RestController
 @RequestMapping("/Admin/Payment")
 @RequiredArgsConstructor

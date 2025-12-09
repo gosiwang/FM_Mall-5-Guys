@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "관리자용 주소 관리 API")
+@Tag(name = "[관리자] 주소 관리 API")
 @RestController
 @RequestMapping("/Admin/Address")
 @RequiredArgsConstructor

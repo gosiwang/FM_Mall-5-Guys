@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "관리자용 환불 관리 API")
+@Tag(name = "[관리자] 환불 관리 API")
 @RestController
 @RequestMapping("/Admin/Refund")
 @RequiredArgsConstructor
