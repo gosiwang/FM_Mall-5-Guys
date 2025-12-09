@@ -25,16 +25,23 @@ public class ReviewController extends BaseController {
         return ResponseEntity.ok(resultReview);
     }
 
-    @GetMapping("/findByUser/{userId}/{curPage}")
-    public ResponseEntity<Page<ReviewResponseDTO>> findReviewByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
+    @GetMapping("/findByUser/{userId}")
+    public ResponseEntity<Page<ReviewResponseDTO>> findReviewByUserIdSortedUpdatedAt(@PathVariable int userId, @RequestParam(defaultValue = "1") int curPage) {
         Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByUserIdSortedUpdatedAt(userId, curPage);
 
         return ResponseEntity.ok(resultInquiryAnswer);
     }
 
-    @GetMapping("/findByOrderItem/{orderItemId}/{curPage}")
-    public ResponseEntity<Page<ReviewResponseDTO>> findReviewByOrderItemIdSortedUpdatedAt(@PathVariable int orderItemId, @PathVariable int curPage) {
+    @GetMapping("/findByOrderItem/{orderItemId}")
+    public ResponseEntity<Page<ReviewResponseDTO>> findReviewByOrderItemIdSortedUpdatedAt(@PathVariable int orderItemId, @RequestParam(defaultValue = "1") int curPage) {
         Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByOrderItemIdSortedUpdatedAt(orderItemId, curPage);
+
+        return ResponseEntity.ok(resultInquiryAnswer);
+    }
+
+    @GetMapping("/findByUser/me")
+    public ResponseEntity<Page<ReviewResponseDTO>> findReviewByUserIdSortedUpdatedAt(@RequestParam(defaultValue = "1") int curPage) {
+        Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByUserIdSortedUpdatedAt(getCurrentUserId(), curPage);
 
         return ResponseEntity.ok(resultInquiryAnswer);
     }

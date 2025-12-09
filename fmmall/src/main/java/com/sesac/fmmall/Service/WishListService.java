@@ -15,7 +15,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -32,24 +35,32 @@ public class WishListService {
         return WishListResponseDTO.from(foundWishList);
     }
 
-    /* 2. 유저별 위시리스트 생성순 상세 조회 */
+    /* 2. 위시리스트 전체 조회 */
+    public List<WishListResponseDTO> findAllWishList() {
+        List<WishList> foundWishListList = wishListRepository.findAll();
+
+        return foundWishListList.stream().map(WishListResponseDTO::from)
+                .collect(Collectors.toList());
+    }
+
+    /* 3. 유저별 위시리스트 생성순 상세 조회 */
     public Page<WishListResponseDTO> findWishListByUserIdSortedCreatedAt(int userId, int curPage) {
 
         if (!userRepository.existsById(userId)) {
             throw new IllegalArgumentException("존재하지 않는 유저입니다.");
         }
 
-        // 2. 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신 생성순 정렬)
+        // 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신 생성순 정렬)
         int page = curPage <= 0 ? 0 : curPage - 1;
         int size = 20;   // 위시리스트는 한 페이지에 20개씩만
         String sortDir = "createdAt";
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
 
-        // 3. 리포지토리 호출 (유저 ID로 필터링 + 페이징/정렬 적용)
+        // 리포지토리 호출 (유저 ID로 필터링 + 페이징/정렬 적용)
         Page<WishList> wishListList = wishListRepository.findAllByUser_UserId(userId, pageRequest);
 
-        // 4. Entity -> DTO 변환 후 반환
+        // Entity -> DTO 변환 후 반환
         return wishListList.map(WishListResponseDTO::from);
     }
 

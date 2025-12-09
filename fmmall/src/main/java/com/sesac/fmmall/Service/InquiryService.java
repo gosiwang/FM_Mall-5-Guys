@@ -38,17 +38,17 @@ public class InquiryService {
             throw new IllegalArgumentException("존재하지 않는 유저입니다.");
         }
 
-        // 2. 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
+        // 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
         int page = curPage <= 0 ? 0 : curPage - 1;
         int size = 10;   // 문의는 한 페이지에 10개씩만
         String sortDir = "updatedAt";
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
 
-        // 3. 리포지토리 호출 (유저 ID로 필터링 + 페이징/정렬 적용)
+        // 리포지토리 호출 (유저 ID로 필터링 + 페이징/정렬 적용)
         Page<Inquiry> inquiryList = inquiryRepository.findAllByUser_UserId(userId, pageRequest);
 
-        // 4. Entity -> DTO 변환 후 반환
+        // Entity -> DTO 변환 후 반환
         return inquiryList.map(InquiryResponseDTO::from);
     }
 
@@ -58,17 +58,17 @@ public class InquiryService {
             throw new IllegalArgumentException("존재하지 않는 상품입니다.");
         }
 
-        // 2. 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
+        // 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
         int page = curPage <= 0 ? 0 : curPage - 1;
         int size = 10;   // 문의는 한 페이지에 10개씩만
         String sortDir = "updatedAt";
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
 
-        // 3. 리포지토리 호출 (상품 ID로 필터링 + 페이징/정렬 적용)
+        // 리포지토리 호출 (상품 ID로 필터링 + 페이징/정렬 적용)
         Page<Inquiry> inquiryList = inquiryRepository.findAllByProduct_ProductId(productId, pageRequest);
 
-        // 4. Entity -> DTO 변환 후 반환
+        // Entity -> DTO 변환 후 반환
         return inquiryList.map(InquiryResponseDTO::from);
     }
 

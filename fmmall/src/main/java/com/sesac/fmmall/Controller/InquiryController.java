@@ -25,17 +25,24 @@ public class InquiryController extends BaseController {
         return ResponseEntity.ok(resultInquiry);
     }
 
-    /* 2. 최신순 정렬(페이징) -> 유저, 상품 */
-    @GetMapping("/findByUser/{userId}/{curPage}")
-    public ResponseEntity<Page<InquiryResponseDTO>> findInquiryByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
+    /* 2. 최신순 정렬(페이징) -> 유저, 상품, 자기자신 */
+    @GetMapping("/findByUser/{userId}")
+    public ResponseEntity<Page<InquiryResponseDTO>> findInquiryByUserIdSortedUpdatedAt(@PathVariable int userId, @RequestParam(defaultValue = "1") int curPage) {
         Page<InquiryResponseDTO> resultInquiryAnswer = inquiryService.findInquiryByUserIdSortedUpdatedAt(userId, curPage);
 
         return ResponseEntity.ok(resultInquiryAnswer);
     }
 
-    @GetMapping("/findByProduct/{productId}/{curPage}")
-    public ResponseEntity<Page<InquiryResponseDTO>> findInquiryByProductIdSortedUpdatedAt(@PathVariable int productId, @PathVariable int curPage) {
+    @GetMapping("/findByProduct/{productId}")
+    public ResponseEntity<Page<InquiryResponseDTO>> findInquiryByProductIdSortedUpdatedAt(@PathVariable int productId, @RequestParam(defaultValue = "1") int curPage) {
         Page<InquiryResponseDTO> resultInquiryAnswer = inquiryService.findInquiryByProductIdSortedUpdatedAt(productId, curPage);
+
+        return ResponseEntity.ok(resultInquiryAnswer);
+    }
+
+    @GetMapping("/findByUser/me")
+    public ResponseEntity<Page<InquiryResponseDTO>> findInquiryByUserIdSortedUpdatedAt(@RequestParam(defaultValue = "1") int curPage) {
+        Page<InquiryResponseDTO> resultInquiryAnswer = inquiryService.findInquiryByUserIdSortedUpdatedAt(getCurrentUserId(), curPage);
 
         return ResponseEntity.ok(resultInquiryAnswer);
     }

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/WishList")
 @RequiredArgsConstructor
@@ -24,15 +26,23 @@ public class WishListController extends BaseController {
         return ResponseEntity.ok(resultWishList);
     }
 
-    /* 2. 최신 생성순 정렬(페이징) -> 유저별 */
-    @GetMapping("/findByUser/{userId}/{curPage}")
-    public ResponseEntity<Page<WishListResponseDTO>> findWishListByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
-        Page<WishListResponseDTO> resultInquiryAnswer = wishListService.findWishListByUserIdSortedCreatedAt(userId, curPage);
+    /* 2. 전체 조회 */
+    @GetMapping("/findAll")
+    public ResponseEntity<List<WishListResponseDTO>> findAll() {
+        List<WishListResponseDTO> resultWishList = wishListService.findAllWishList();
+
+        return ResponseEntity.ok(resultWishList);
+    }
+
+    /* 3. 최신 생성순 정렬(페이징) -> 자기자신 */
+    @GetMapping("/findByUser/me")
+    public ResponseEntity<Page<WishListResponseDTO>> findWishListByUserIdSortedUpdatedAt(@RequestParam(defaultValue = "1") int curPage) {
+        Page<WishListResponseDTO> resultInquiryAnswer = wishListService.findWishListByUserIdSortedCreatedAt(getCurrentUserId(), curPage);
 
         return ResponseEntity.ok(resultInquiryAnswer);
     }
 
-    /* 3. 위시리스트 등록 */
+    /* 4. 위시리스트 등록 */
     @PostMapping("/insert")
     public ResponseEntity<WishListResponseDTO> insertWishList(@RequestBody WishListRequestDTO requestDTO) {
         WishListResponseDTO newWishList = wishListService.insertWishList(getCurrentUserId(), requestDTO);
@@ -40,7 +50,7 @@ public class WishListController extends BaseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newWishList);
     }
 
-    /* 4. 위시리스트 삭제 */
+    /* 5. 위시리스트 삭제 */
     @DeleteMapping("/delete/{wishListId}")
     public ResponseEntity<Void> deleteWishList(@PathVariable int wishListId) {
 
