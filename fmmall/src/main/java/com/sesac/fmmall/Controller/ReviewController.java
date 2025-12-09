@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Review", description = "리뷰 API")
+@Tag(name = "리뷰 API")
 @RestController
 @RequestMapping("/Review")
 @RequiredArgsConstructor

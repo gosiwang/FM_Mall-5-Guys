@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Admin User", description = "관리자용 사용자 관리 API")
+@Tag(name = "관리자용 사용자 관리 API")
 @RestController
 @RequestMapping("/Admin/User")
 @RequiredArgsConstructor
@@ -29,9 +29,17 @@ public class AdminUserController {
             @ApiResponse(responseCode = "403", description = "관리자 권한 없음")
     })
     @GetMapping("/findAll")
-    public ResponseEntity<List<UserResponseDto>> findAllUsers() {
+    public ResponseEntity<List<UserResponseDto>> adminFindAllUsers() {
         List<UserResponseDto> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "[관리자] 특정 사용자 조회", description = "해당 사용자의 정보를 조회합니다")
+    @GetMapping("/findOne/{userId}")
+    public ResponseEntity<UserResponseDto> adminFindOne(@PathVariable Integer userId) {
+        UserResponseDto response = userService.getUserInfo(userId);
+        return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

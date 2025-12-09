@@ -4,7 +4,7 @@ import com.sesac.fmmall.DTO.Refund.RefundCreateRequest;
 import com.sesac.fmmall.DTO.Refund.RefundResponse;
 import com.sesac.fmmall.DTO.Refund.RefundSummaryResponse;
 import com.sesac.fmmall.Service.RefundService;
-io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Refund", description = "환불 API")
+@Tag(name = "환불 API")
 @RestController
 @RequestMapping("/Refund")
 @RequiredArgsConstructor
