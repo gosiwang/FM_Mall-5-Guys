@@ -52,8 +52,8 @@ public class ReviewController extends BaseController {
             @ApiResponse(responseCode = "404", description = "주문 상품을 찾을 수 없음")
     })
     @GetMapping("/findByOrderItem/{orderItemId}")
-    public ResponseEntity<Page<ReviewResponseDTO>> findReviewByOrderItemIdSortedUpdatedAt(@PathVariable int orderItemId, @RequestParam(defaultValue = "1") int curPage) {
-        Page<ReviewResponseDTO> resultInquiryAnswer = reviewService.findReviewByOrderItemIdSortedUpdatedAt(orderItemId, curPage);
+    public ResponseEntity<ReviewResponseDTO> findReviewByOrderItemId(@PathVariable int orderItemId) {
+        ReviewResponseDTO resultInquiryAnswer = reviewService.findReviewByOrderItemId(orderItemId);
 
         return ResponseEntity.ok(resultInquiryAnswer);
     }

@@ -13,7 +13,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     Page<Review> findAllByOrderByUpdatedAtDesc(Pageable pageable);
 
     Page<Review> findAllByUser_UserId(int userId, Pageable pageable);
-    Page<Review> findAllByOrderItem_OrderItemId(int orderItemId, Pageable pageable);
+    Review findByOrderItem_OrderItemId(int orderItemId);
 
     @Modifying
     @Transactional

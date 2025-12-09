@@ -65,4 +65,10 @@ public class InquiryAnswerController extends BaseController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<Void> deleteAllInquiryAnswer() {
+        inquiryAnswerService.deleteAllInquiryAnswer();
+        return ResponseEntity.noContent().build();
+    }
 }
