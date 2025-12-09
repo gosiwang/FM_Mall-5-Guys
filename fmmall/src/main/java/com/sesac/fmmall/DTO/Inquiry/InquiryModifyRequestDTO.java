@@ -10,7 +10,6 @@ import lombok.ToString;
 @Setter
 @ToString
 @NoArgsConstructor
-public class InquiryRequestDTO {
+public class InquiryModifyRequestDTO {
     private String inquiryContent;
-    private int productId;
 }
