@@ -10,9 +10,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @NoArgsConstructor
-public class ReviewRequestDTO {
+public class ReviewModifyRequestDTO {
     private Double reviewRating;
     private String reviewContent;
-
-    private int orderItemId;
 }

@@ -1,16 +1,14 @@
 package com.sesac.fmmall.Service;
 
+import com.sesac.fmmall.DTO.Review.ReviewModifyRequestDTO;
 import com.sesac.fmmall.DTO.Review.ReviewRequestDTO;
-import com.sesac.fmmall.DTO.Review.ReviewResponseDTO;
 import com.sesac.fmmall.DTO.Review.ReviewResponseDTO;
 import com.sesac.fmmall.Entity.*;
 import com.sesac.fmmall.Repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -26,22 +24,9 @@ public class ReviewService {
         Review foundReview = reviewRepository.findById(reviewId).orElseThrow(
                 () -> new IllegalArgumentException("해당 ID를 가진 리뷰가 존재하지 않습니다."));
 
-//        return new ReviewResponseDTO(foundReview);
         return ReviewResponseDTO.from(foundReview);
     }
-//    /* 2. 리뷰 최신순 상세 조회 */
-//    public Page<ReviewResponseDTO> findAllSortedUpdatedAt(Pageable pageable) {
-//        int page = pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1;
-//        int size = pageable.getPageSize();
-////        Sort sort = pageable.getSort();
-//        String sortDir = "updatedAt";
-//
-//        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
-//        Page<Review> ReviewList = reviewRepository.findAllByOrderByUpdatedAtDesc(pageRequest);
-////        return ReviewList.map(ReviewResponseDTO::new);
-//        return ReviewList.map(ReviewResponseDTO::from);
-////        return modelMapper.map(foundReview, ReviewResponseDTO.class);
-//    }
+
     /* 2. 리뷰 최신순 상세 조회(유저, 주문 상품별) */
     public Page<ReviewResponseDTO> findReviewByUserIdSortedUpdatedAt(int userId, int curPage) {
 
@@ -49,18 +34,17 @@ public class ReviewService {
             throw new IllegalArgumentException("존재하지 않는 유저입니다.");
         }
 
-        // 2. 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
+        // 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
         int page = curPage <= 0 ? 0 : curPage - 1;
         int size = 10;   // 리뷰는 한 페이지에 10개씩만
         String sortDir = "updatedAt";
 
-        // Sort.by(sortDir).descending() -> 최신순(내림차순)
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
 
-        // 3. 리포지토리 호출 (유저 ID로 필터링 + 페이징/정렬 적용)
+        // 리포지토리 호출 (유저 ID로 필터링 + 페이징/정렬 적용)
         Page<Review> reviewList = reviewRepository.findAllByUser_UserId(userId, pageRequest);
 
-        // 4. Entity -> DTO 변환 후 반환
+        // Entity -> DTO 변환 후 반환
         return reviewList.map(ReviewResponseDTO::from);
     }
 
@@ -70,25 +54,24 @@ public class ReviewService {
             throw new IllegalArgumentException("존재하지 않는 상품입니다.");
         }
 
-        // 2. 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
+        // 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
         int page = curPage <= 0 ? 0 : curPage - 1;
         int size = 10;   // 리뷰는 한 페이지에 10개씩만
         String sortDir = "updatedAt";
 
-        // Sort.by(sortDir).descending() -> 최신순(내림차순)
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
 
-        // 3. 리포지토리 호출 (주문상품 ID로 필터링 + 페이징/정렬 적용)
+        // 리포지토리 호출 (주문상품 ID로 필터링 + 페이징/정렬 적용)
         Page<Review> reviewList = reviewRepository.findAllByOrderItem_OrderItemId(orderItemId, pageRequest);
 
-        // 4. Entity -> DTO 변환 후 반환
+        // Entity -> DTO 변환 후 반환
         return reviewList.map(ReviewResponseDTO::from);
     }
 
     /* 3. 리뷰 등록 */
     @Transactional
-    public ReviewResponseDTO insertReview(ReviewRequestDTO requestDTO) {
-        User user = userRepository.findById(requestDTO.getUserId())
+    public ReviewResponseDTO insertReview(int writerId, ReviewRequestDTO requestDTO) {
+        User user = userRepository.findById(writerId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         OrderItem orderItem = orderItemRepository.findById(requestDTO.getOrderItemId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
@@ -105,16 +88,18 @@ public class ReviewService {
 
         // 저장 후, 생성된 Entity를 다시 DTO로 변환하여 반환
         return ReviewResponseDTO.from(savedReview);
-//        return modelMapper.map(savedReview, ReviewResponseDTO.class);
-//        return new ReviewResponseDTO(savedReview);
     }
 
     /* 4. 리뷰 수정 */
     @Transactional
-    public ReviewResponseDTO modifyReviewContent(int reviewId, ReviewRequestDTO requestDTO) {
+    public ReviewResponseDTO modifyReviewContent(int reviewId, int currentUserId, ReviewModifyRequestDTO requestDTO) {
 
         Review foundReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("수정할 리뷰가 존재하지 않습니다."));
+
+        if (foundReview.getUser().getUserId() != currentUserId) {
+            throw new IllegalArgumentException("수정 권한이 없습니다. (작성자 불일치)");
+        }
 
         foundReview.modify(
             requestDTO.getReviewContent(),
@@ -122,8 +107,6 @@ public class ReviewService {
         );
 
         return ReviewResponseDTO.from(foundReview);
-//        return modelMapper.map(foundReview, ReviewResponseDTO.class);
-//        return new ReviewResponseDTO(foundReview);
     }
 
     /* 5. 리뷰 삭제 */

@@ -1,5 +1,6 @@
 package com.sesac.fmmall.Service;
 
+import com.sesac.fmmall.DTO.Inquiry.InquiryModifyRequestDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryRequestDTO;
 import com.sesac.fmmall.DTO.Inquiry.InquiryResponseDTO;
 import com.sesac.fmmall.Entity.Inquiry;
@@ -10,10 +11,8 @@ import com.sesac.fmmall.Repository.ProductRepository;
 import com.sesac.fmmall.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -23,29 +22,14 @@ public class InquiryService {
     private final InquiryRepository inquiryRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final ModelMapper modelMapper;
 
     /* 1. 문의 코드로 상세 조회 */
     public InquiryResponseDTO findInquiryByInquiryId(int inquiryId) {
         Inquiry foundInquiry = inquiryRepository.findById(inquiryId).orElseThrow(
                 () -> new IllegalArgumentException("해당 ID를 가진 문의가 존재하지 않습니다."));
 
-//        return new InquiryResponseDTO(foundInquiry);
         return InquiryResponseDTO.from(foundInquiry);
     }
-//    /* 2. 문의 최신순 상세 조회 */
-//    public Page<InquiryResponseDTO> findAllSortedUpdatedAt(Pageable pageable) {
-//        int page = pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1;
-//        int size = pageable.getPageSize();
-////        Sort sort = pageable.getSort();
-//        String sortDir = "updatedAt";
-//
-//        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
-//        Page<Inquiry> InquiryList = inquiryRepository.findAllByOrderByUpdatedAtDesc(pageRequest);
-////        return InquiryList.map(InquiryResponseDTO::new);
-//        return InquiryList.map(InquiryResponseDTO::from);
-////        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
-//    }
 
     /* 2. 문의 최신순 상세 조회(유저, 상품별) */
     public Page<InquiryResponseDTO> findInquiryByUserIdSortedUpdatedAt(int userId, int curPage) {
@@ -54,18 +38,17 @@ public class InquiryService {
             throw new IllegalArgumentException("존재하지 않는 유저입니다.");
         }
 
-        // 2. 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
+        // 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
         int page = curPage <= 0 ? 0 : curPage - 1;
         int size = 10;   // 문의는 한 페이지에 10개씩만
         String sortDir = "updatedAt";
 
-        // Sort.by(sortDir).descending() -> 최신순(내림차순)
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
 
-        // 3. 리포지토리 호출 (유저 ID로 필터링 + 페이징/정렬 적용)
+        // 리포지토리 호출 (유저 ID로 필터링 + 페이징/정렬 적용)
         Page<Inquiry> inquiryList = inquiryRepository.findAllByUser_UserId(userId, pageRequest);
 
-        // 4. Entity -> DTO 변환 후 반환
+        // Entity -> DTO 변환 후 반환
         return inquiryList.map(InquiryResponseDTO::from);
     }
 
@@ -75,26 +58,25 @@ public class InquiryService {
             throw new IllegalArgumentException("존재하지 않는 상품입니다.");
         }
 
-        // 2. 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
+        // 페이징 및 정렬 설정 (기존 로직과 동일: 0페이지 보정 + 최신순 정렬)
         int page = curPage <= 0 ? 0 : curPage - 1;
         int size = 10;   // 문의는 한 페이지에 10개씩만
         String sortDir = "updatedAt";
 
-        // Sort.by(sortDir).descending() -> 최신순(내림차순)
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDir).descending());
 
-        // 3. 리포지토리 호출 (상품 ID로 필터링 + 페이징/정렬 적용)
+        // 리포지토리 호출 (상품 ID로 필터링 + 페이징/정렬 적용)
         Page<Inquiry> inquiryList = inquiryRepository.findAllByProduct_ProductId(productId, pageRequest);
 
-        // 4. Entity -> DTO 변환 후 반환
+        // Entity -> DTO 변환 후 반환
         return inquiryList.map(InquiryResponseDTO::from);
     }
 
 
     /* 3. 문의 등록 */
     @Transactional
-    public InquiryResponseDTO insertInquiry(InquiryRequestDTO requestDTO) {
-        User user = userRepository.findById(requestDTO.getUserId())
+    public InquiryResponseDTO insertInquiry(int writerId, InquiryRequestDTO requestDTO) {
+        User user = userRepository.findById(writerId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         Product product = productRepository.findById(requestDTO.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
@@ -111,24 +93,24 @@ public class InquiryService {
 
         // 저장 후, 생성된 Entity를 다시 DTO로 변환하여 반환
         return InquiryResponseDTO.from(savedInquiry);
-//        return modelMapper.map(savedInquiry, InquiryResponseDTO.class);
-//        return new InquiryResponseDTO(savedInquiry);
     }
 
     /* 4. 문의 수정 */
     @Transactional
-    public InquiryResponseDTO modifyInquiryContent(int inquiryId, InquiryRequestDTO requestDTO) {
+    public InquiryResponseDTO modifyInquiryContent(int inquiryId, int currentUserId, InquiryModifyRequestDTO requestDTO) {
 
         Inquiry foundInquiry = inquiryRepository.findById(inquiryId)
                 .orElseThrow(() -> new IllegalArgumentException("수정할 문의가 존재하지 않습니다."));
+
+        if (foundInquiry.getUser().getUserId() != currentUserId) {
+            throw new IllegalArgumentException("수정 권한이 없습니다. (작성자 불일치)");
+        }
 
         foundInquiry.modifyContent(
             requestDTO.getInquiryContent()
         );
 
         return InquiryResponseDTO.from(foundInquiry);
-//        return modelMapper.map(foundInquiry, InquiryResponseDTO.class);
-//        return new InquiryResponseDTO(foundInquiry);
     }
 
     /* 5. 문의 삭제 */

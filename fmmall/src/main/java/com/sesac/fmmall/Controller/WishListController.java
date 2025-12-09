@@ -9,10 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/WishList")
 @RequiredArgsConstructor
-public class WishListController {
+public class WishListController extends BaseController {
 
     private final WishListService wishListService;
 
@@ -20,33 +22,40 @@ public class WishListController {
     @GetMapping("/find/{wishListId}")
     public ResponseEntity<WishListResponseDTO> findWishListById(@PathVariable int wishListId) {
         WishListResponseDTO resultWishList = wishListService.findWishListByWishListId(wishListId);
-        // 상태 코드 200(ok)와 함께 JSON 반환
+
         return ResponseEntity.ok(resultWishList);
     }
 
-//    /* 2. 최신 생성순 정렬(페이징) -> 유저별 */
-    @GetMapping("/findByUser/{userId}/{curPage}")
-    public ResponseEntity<Page<WishListResponseDTO>> findWishListByUserIdSortedUpdatedAt(@PathVariable int userId, @PathVariable int curPage) {
-        Page<WishListResponseDTO> resultInquiryAnswer = wishListService.findWishListByUserIdSortedCreatedAt(userId, curPage);
-        // 상태 코드 200(ok)와 함께 JSON 반환
+    /* 2. 전체 조회 */
+    @GetMapping("/findAll")
+    public ResponseEntity<List<WishListResponseDTO>> findAll() {
+        List<WishListResponseDTO> resultWishList = wishListService.findAllWishList();
+
+        return ResponseEntity.ok(resultWishList);
+    }
+
+    /* 3. 최신 생성순 정렬(페이징) -> 자기자신 */
+    @GetMapping("/findByUser/me")
+    public ResponseEntity<Page<WishListResponseDTO>> findWishListByUserIdSortedUpdatedAt(@RequestParam(defaultValue = "1") int curPage) {
+        Page<WishListResponseDTO> resultInquiryAnswer = wishListService.findWishListByUserIdSortedCreatedAt(getCurrentUserId(), curPage);
+
         return ResponseEntity.ok(resultInquiryAnswer);
     }
 
-    /* 3. 위시리스트 등록 */
+    /* 4. 위시리스트 등록 */
     @PostMapping("/insert")
     public ResponseEntity<WishListResponseDTO> insertWishList(@RequestBody WishListRequestDTO requestDTO) {
-        WishListResponseDTO newWishList = wishListService.insertWishList(requestDTO);
-        // 신규 리소스 생성 시 201 Created 상태 코드 반환
+        WishListResponseDTO newWishList = wishListService.insertWishList(getCurrentUserId(), requestDTO);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(newWishList);
     }
 
-    /* 4. 위시리스트 삭제 */
+    /* 5. 위시리스트 삭제 */
     @DeleteMapping("/delete/{wishListId}")
     public ResponseEntity<Void> deleteWishList(@PathVariable int wishListId) {
 
         wishListService.deleteWishList(wishListId);
 
-//        삭제 성공 시 내용 없이 204 반환
         return ResponseEntity.noContent().build();
     }
 
@@ -59,7 +68,7 @@ public class WishListController {
     @PostMapping("/toggle")
     public ResponseEntity<WishListResponseDTO> toggleWishlist(@RequestBody WishListRequestDTO request) {
 
-        WishListResponseDTO toggleWishList = wishListService.toggleWishlist(request);
+        WishListResponseDTO toggleWishList = wishListService.toggleWishlist(getCurrentUserId(), request);
 
         return ResponseEntity.ok(toggleWishList);
     }
