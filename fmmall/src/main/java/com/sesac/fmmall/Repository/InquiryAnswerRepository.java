@@ -9,6 +9,7 @@ public interface InquiryAnswerRepository extends JpaRepository<InquiryAnswer, In
 //    /* 전달 받은 정렬 기준으로 조회 (페이징) */
 //    Page<Inquiry> findAll(Pageable pageable);
 
-    Page<InquiryAnswer> findAllByOrderByUpdatedAtDesc(Pageable pageable);
+    Page<InquiryAnswer> findAllByUser_UserId(int userUserId, Pageable pageable);
+    Page<InquiryAnswer> findAllByInquiry_InquiryId(int inquiryId, Pageable pageable);
 
 }
