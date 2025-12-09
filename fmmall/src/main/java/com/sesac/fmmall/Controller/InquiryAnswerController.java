@@ -71,12 +71,18 @@ public class InquiryAnswerController {
     }
 
     /* 5. 문의 답변 삭제 */
-    @DeleteMapping("/delete/{inquiryAnswerId} ")
+    @DeleteMapping("/delete/{inquiryAnswerId}")
     public ResponseEntity<Void> deleteInquiryAnswer(@PathVariable int inquiryAnswerId) {
 
         inquiryAnswerService.deleteInquiryAnswer(inquiryAnswerId);
 
 //        삭제 성공 시 내용 없이 204 반환
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<Void> deleteAllInquiryAnswer() {
+        inquiryAnswerService.deleteAllInquiryAnswer();
         return ResponseEntity.noContent().build();
     }
 }

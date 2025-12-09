@@ -64,12 +64,18 @@ public class ReviewController {
     }
 
     /* 5. 리뷰 삭제 */
-    @DeleteMapping("/delete/{reviewId} ")
+    @DeleteMapping("/delete/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable int reviewId) {
 
         reviewService.deleteReview(reviewId);
 
 //        삭제 성공 시 내용 없이 204 반환
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<Void> deleteAllReview() {
+        reviewService.deleteAllReview();
         return ResponseEntity.noContent().build();
     }
 }

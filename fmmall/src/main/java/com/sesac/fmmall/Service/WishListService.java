@@ -116,5 +116,14 @@ public class WishListService {
         }
     }
 
+    @Transactional
+    public void deleteAllWishList() {
+        wishListRepository.deleteAll();
+
+        wishListRepository.flush();
+
+        wishListRepository.resetAutoIncrement();
+    }
+
 
 }

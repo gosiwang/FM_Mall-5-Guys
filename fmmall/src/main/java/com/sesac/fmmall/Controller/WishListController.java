@@ -41,12 +41,18 @@ public class WishListController {
     }
 
     /* 4. 위시리스트 삭제 */
-    @DeleteMapping("/delete/{wishListId} ")
+    @DeleteMapping("/delete/{wishListId}")
     public ResponseEntity<Void> deleteWishList(@PathVariable int wishListId) {
 
         wishListService.deleteWishList(wishListId);
 
 //        삭제 성공 시 내용 없이 204 반환
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<Void> deleteAllWishList() {
+        wishListService.deleteAllWishList();
         return ResponseEntity.noContent().build();
     }
 

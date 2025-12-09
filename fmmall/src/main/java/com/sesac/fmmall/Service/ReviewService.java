@@ -138,5 +138,14 @@ public class ReviewService {
         reviewRepository.deleteById(reviewId);
     }
 
+    @Transactional
+    public void deleteAllReview() {
+        reviewRepository.deleteAll();
+
+        reviewRepository.flush();
+
+        reviewRepository.resetAutoIncrement();
+    }
+
 
 }
