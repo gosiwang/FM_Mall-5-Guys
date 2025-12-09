@@ -35,7 +35,7 @@ public class Review {
     private User user;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_item_id")
+    @JoinColumn(name = "order_item_id", unique = true)
     private OrderItem orderItem;
 
     public void modify(String content, Double rating){

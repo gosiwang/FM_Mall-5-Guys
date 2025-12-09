@@ -8,12 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
     Page<Review> findAllByOrderByUpdatedAtDesc(Pageable pageable);
 
     Page<Review> findAllByUser_UserId(int userId, Pageable pageable);
-    Review findByOrderItem_OrderItemId(int orderItemId);
+    Optional<Review> findByOrderItem_OrderItemId(int orderItemId);
 
     @Modifying
     @Transactional
