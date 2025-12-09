@@ -18,30 +18,35 @@ const LoginPage = () => {
     setError('');
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      const response = await authAPI.login(formData.loginId, formData.password);
-      
-      // 토큰 저장
-      localStorage.setItem('token', response.data.token);
-      
-      // 사용자 정보 저장
-      const user = {
-        loginId: response.data.loginId,
-        role: response.data.role
-      };
-      localStorage.setItem('user', JSON.stringify(user));
-      
-      // 메인 페이지로 이동
-      navigate('/');
-      window.location.reload(); // 헤더 업데이트를 위한 새로고침
-    } catch (error) {
-      console.error('로그인 실패:', error);
-      setError('아이디 또는 비밀번호가 일치하지 않습니다.');
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await authAPI.login(formData.loginId, formData.password);
+
+            // ✅ 응답 데이터 구조 확인
+            console.log('로그인 응답:', response.data);
+
+            // 토큰 저장
+            localStorage.setItem('token', response.data.token);
+
+            // 사용자 정보 저장
+            const user = {
+                loginId: response.data.loginId,
+                role: response.data.role  // "ADMIN" 또는 "USER"
+            };
+
+            console.log('저장된 user 정보:', user);  // ✅ 확인용
+            localStorage.setItem('user', JSON.stringify(user));
+
+            // 메인 페이지로 이동
+            navigate('/');
+            window.location.reload();
+        } catch (error) {
+            console.error('로그인 실패:', error);
+            setError('아이디 또는 비밀번호가 일치하지 않습니다.');
+        }
+    };
 
   return (
     <main className="main" style={{ gridTemplateColumns: '1fr', maxWidth: '480px', margin: '3rem auto' }}>

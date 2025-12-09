@@ -74,14 +74,14 @@ const MainPage = () => {
       filtered = filtered.filter(p => p.categoryId === filters.categoryId);
     }
 
-    // 브랜드 필터
+  /*  // 브랜드 필터
     if (filters.brands && filters.brands.length > 0) {
       filtered = filtered.filter(p => 
         filters.brands.some(brand => 
           p.brandName?.includes(brand) || brand === '기타'
         )
       );
-    }
+    }*/
 
     // 가격 필터
     if (filters.priceRange) {

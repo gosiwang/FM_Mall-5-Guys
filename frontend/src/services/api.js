@@ -38,16 +38,21 @@ apiClient.interceptors.response.use(
 
 // 인증 관련 API
 export const authAPI = {
-  login: (loginId, password) => 
-    apiClient.post('/User/login', { loginId, password }),
-  
-  signup: (userData) => 
-    apiClient.post('/User/signup', userData),
-  
-  getMyInfo: () => 
-    apiClient.get('/User/myFindOne'),
-};
+    login: (loginId, password) =>
+        apiClient.post('/User/login', { loginId, password }),
 
+    signup: (userData) =>
+        apiClient.post('/User/signup', userData),
+
+    getMyInfo: () =>
+        apiClient.get('/User/myFindOne'),
+
+    updateUser: (userData) =>
+        apiClient.put('/User/modify', userData),
+
+    deleteUser: (data) =>
+        apiClient.delete('/User/delete', { data }),
+};
 // 상품 관련 API
 export const productAPI = {
   getAllProducts: () => 
@@ -62,11 +67,11 @@ export const productAPI = {
 
 // 카테고리 관련 API
 export const categoryAPI = {
-  getAllCategories: () => 
-    apiClient.get('/ColumnCategory/findAll'),
-  
-  getSubCategories: (columnCategoryId) => 
-    apiClient.get(`/RowCategory/findByColumn/${columnCategoryId}`),
+    getAllCategories: () =>
+        apiClient.get('/Category/findAll'),  //  ColumnCategory → Category
+
+    getSubCategories: (columnCategoryId) =>
+        apiClient.get(`/RowCategory/findByColumn/${columnCategoryId}`),
 };
 
 // 주소 관련 API
