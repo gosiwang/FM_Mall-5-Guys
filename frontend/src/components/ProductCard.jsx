@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { cartAPI } from '../services/api';
 
 const ProductCard = ({ product }) => {
     const navigate = useNavigate();
@@ -8,9 +9,41 @@ const ProductCard = ({ product }) => {
         navigate(`/product/${product.productId}`);
     };
 
-    const handleAddToCart = (e) => {
+    const handleAddToCart = async (e) => {
         e.stopPropagation();
-        alert('장바구니에 추가되었습니다.');
+
+        // 로그인 확인
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            navigate('/login');
+            return;
+        }
+
+        try {
+            // 장바구니에 상품 추가 API 호출
+            await cartAPI.addToCart({
+                productId: product.productId,
+                quantity: 1
+            });
+
+            alert('장바구니에 추가되었습니다.');
+
+            // 장바구니로 이동할지 물어보기
+            if (window.confirm('장바구니로 이동하시겠습니까?')) {
+                navigate('/cart');
+            }
+        } catch (error) {
+            console.error('장바구니 추가 실패:', error);
+            if (error.response?.status === 401) {
+                alert('로그인이 필요합니다.');
+                navigate('/login');
+            } else if (error.response?.status === 404) {
+                alert('상품을 찾을 수 없습니다.');
+            } else {
+                alert('장바구니 추가에 실패했습니다.');
+            }
+        }
     };
 
     return (
@@ -37,7 +70,6 @@ const ProductCard = ({ product }) => {
             <h3 className="product-card__name">{product.productName}</h3>
             <p className="product-card__brand">{product.brandName || '브랜드'}</p>
 
-            {/* ✅ price → productPrice로 수정 */}
             <p className="product-card__price">
                 {product.productPrice?.toLocaleString('ko-KR')}원
             </p>

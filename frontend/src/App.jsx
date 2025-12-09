@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AdminPage from './pages/AdminPage';
 import MyPage from './pages/MyPage';
+import CartPage from './pages/CartPage';
 import './styles.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
                         <Route path="/signup" element={<SignupPage />} />
                         <Route path="/admin" element={<AdminPage />} />
                         <Route path="/mypage" element={<MyPage />} />
+                        <Route path="/cart" element={<CartPage />} />
                     </Routes>
                 </div>
                 <Footer />

@@ -28,7 +28,7 @@ const LoginPage = () => {
             console.log('로그인 응답:', response.data);
 
             // 토큰 저장
-            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('token', response.data.accessToken);
 
             // 사용자 정보 저장
             const user = {

@@ -67,6 +67,9 @@ const Header = () => {
             <Link to="/mypage">
               <button className="btn btn--ghost">마이페이지</button>
             </Link>
+              <Link to="/cart">
+                  <button className="btn btn--ghost">장바구니</button>
+              </Link>
             <button className="btn btn--ghost" onClick={handleLogout}>
               로그아웃
             </button>
