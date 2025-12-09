@@ -42,10 +42,10 @@ const Header = () => {
 
       <nav className="nav">
         <Link to="/" className="nav__link nav__link--active">홈</Link>
-        <Link to="/products/new" className="nav__link">신상품</Link>
+       {/* <Link to="/products/new" className="nav__link">신상품</Link>
         <Link to="/products/best" className="nav__link">베스트</Link>
         <Link to="/events" className="nav__link">기획전</Link>
-        <Link to="/support" className="nav__link">고객센터</Link>
+        <Link to="/support" className="nav__link">고객센터</Link>*/}
       </nav>
 
       <div className="header__actions">
