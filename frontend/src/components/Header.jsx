@@ -64,6 +64,9 @@ const Header = () => {
             <span style={{ fontSize: '0.9rem', color: '#4b5563' }}>
               {user?.name || user?.loginId}님
             </span>
+              <Link to="/orders">
+                  <button className="btn btn--ghost">주문내역</button>
+              </Link>
             <Link to="/mypage">
               <button className="btn btn--ghost">마이페이지</button>
             </Link>

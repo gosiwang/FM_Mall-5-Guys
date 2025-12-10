@@ -70,7 +70,8 @@ const CartPage = () => {
             alert('장바구니가 비어있습니다.');
             return;
         }
-        navigate('/order');
+        // 👉 결제 페이지로 이동
+        navigate('/cart/checkout');
     };
 
     if (loading) {
