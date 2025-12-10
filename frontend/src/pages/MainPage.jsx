@@ -14,7 +14,7 @@ const MainPage = () => {
     const [introComplete, setIntroComplete] = useState(false);
 
     useEffect(() => {
-        // ✅ sessionStorage 확인 - 브라우저 닫으면 초기화
+
         if (!shouldShowIntro()) {
             setShowIntro(false);
             setIntroComplete(true);
@@ -36,7 +36,7 @@ const MainPage = () => {
             setLoading(false);
             setTimeout(() => {
                 handleIntroComplete();
-            }, 3000);
+            }, 7000);
         }
     };
 

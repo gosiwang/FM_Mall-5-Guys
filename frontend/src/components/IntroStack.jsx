@@ -65,7 +65,7 @@ const IntroStack = ({ onComplete }) => {
                         <div className="card-content card-pink">
                             <div className="card-icon">🎁</div>
                             <h2 className="card-title">오늘의 특가</h2>
-                            <p className="card-text">최대 0% 할인 이벤트 진행중</p>
+                            <p className="card-text">최대 50% 할인 이벤트 진행중</p>
                         </div>
                     </div>
 
