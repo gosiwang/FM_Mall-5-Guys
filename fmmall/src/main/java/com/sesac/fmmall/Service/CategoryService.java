@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,5 +75,12 @@ public class CategoryService {
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductResponseDTO.class))
                 .toList();
+    }
+
+    public List<CategoryDTO> findAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream()
+                .map(category -> modelMapper.map(category, CategoryDTO.class))
+                .collect(Collectors.toList());
     }
 }

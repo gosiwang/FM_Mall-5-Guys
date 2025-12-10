@@ -40,7 +40,7 @@ class BrandServiceTest {
     void insertBrand_success() {
 
         BrandDTO request = BrandDTO.builder()
-                .brandName("테스트브랜드")
+                .name("테스트브랜드")
                 .build();
 
         // ModelMapper mock → 실제 매핑 수행하도록 설정
@@ -56,7 +56,7 @@ class BrandServiceTest {
                     real.typeMap(Brand.class, BrandDTO.class)
                             .addMappings(m -> {
                                 m.map(Brand::getBrandId, BrandDTO::setBrandId);
-                                m.map(Brand::getName, BrandDTO::setBrandName);
+                                m.map(Brand::getName, BrandDTO::setName);
                             });
 
                     return real.map(source, BrandDTO.class);
@@ -66,7 +66,7 @@ class BrandServiceTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getBrandId()).isGreaterThan(0);
-        assertThat(result.getBrandName()).isEqualTo("테스트브랜드");
+        assertThat(result.getName()).isEqualTo("테스트브랜드");
 
         Brand saved = brandRepository.findById(result.getBrandId())
                 .orElseThrow();
@@ -88,7 +88,7 @@ class BrandServiceTest {
 
         BrandDTO request = BrandDTO.builder()
                 .brandId(brandId)
-                .brandName(updatedName)
+                .name(updatedName)
                 .build();
 
         // Mapper mock 설정
@@ -104,7 +104,7 @@ class BrandServiceTest {
                     real.typeMap(Brand.class, BrandDTO.class)
                             .addMappings(m -> {
                                 m.map(Brand::getBrandId, BrandDTO::setBrandId);
-                                m.map(Brand::getName, BrandDTO::setBrandName);
+                                m.map(Brand::getName, BrandDTO::setName);
                             });
 
                     return real.map(source, BrandDTO.class);
@@ -113,7 +113,7 @@ class BrandServiceTest {
         BrandDTO result = brandService.modifyBrand(brandId, request);
 
         assertThat(result.getBrandId()).isEqualTo(brandId);
-        assertThat(result.getBrandName()).isEqualTo(updatedName);
+        assertThat(result.getName()).isEqualTo(updatedName);
 
         Brand updated = brandRepository.findById(brandId)
                 .orElseThrow();

@@ -54,7 +54,7 @@ class RowCategoryServiceTest {
 
         // 🔹 2) 요청 DTO 생성
         RowCategoryDTO requestDTO = RowCategoryDTO.builder()
-                .categoryName("테스트 하위 카테고리")
+                .name("테스트 하위 카테고리")
                 .categoryId(parentCategory.getCategoryId())
                 .build();
 
@@ -71,7 +71,7 @@ class RowCategoryServiceTest {
                     real.typeMap(RowCategory.class, RowCategoryDTO.class)
                             .addMappings(m -> {
                                 m.map(RowCategory::getRowCategoryId, RowCategoryDTO::setRowCategoryId);
-                                m.map(RowCategory::getName, RowCategoryDTO::setCategoryName);
+                                m.map(RowCategory::getName, RowCategoryDTO::setName);
                                 m.map(rc -> rc.getCategory().getCategoryId(), RowCategoryDTO::setCategoryId);
                             });
 
@@ -82,13 +82,13 @@ class RowCategoryServiceTest {
         RowCategoryDTO result = rowCategoryService.insertRowCategory(requestDTO);
 
         System.out.println("=== 🔥 insertRowCategory 결과 DTO ===");
-        System.out.println(result.getRowCategoryId() + " / " + result.getCategoryName() +
+        System.out.println(result.getRowCategoryId() + " / " + result.getName() +
                 " / parentId=" + result.getCategoryId());
 
         // 🔹 5) DTO 검증
         assertThat(result).isNotNull();
         assertThat(result.getRowCategoryId()).isGreaterThan(0);
-        assertThat(result.getCategoryName()).isEqualTo("테스트 하위 카테고리");
+        assertThat(result.getName()).isEqualTo("테스트 하위 카테고리");
         assertThat(result.getCategoryId()).isEqualTo(parentCategory.getCategoryId());
 
         // 🔹 6) 실제 DB 검증
@@ -116,7 +116,7 @@ class RowCategoryServiceTest {
         // 🔹 2) 수정 요청 DTO 생성
         RowCategoryDTO requestDTO = RowCategoryDTO.builder()
                 .rowCategoryId(rowCategoryId)
-                .categoryName(updatedName)
+                .name(updatedName)
                 .categoryId(original.getCategory().getCategoryId())
                 .build();
 
@@ -133,7 +133,7 @@ class RowCategoryServiceTest {
                     real.typeMap(RowCategory.class, RowCategoryDTO.class)
                             .addMappings(m -> {
                                 m.map(RowCategory::getRowCategoryId, RowCategoryDTO::setRowCategoryId);
-                                m.map(RowCategory::getName, RowCategoryDTO::setCategoryName);
+                                m.map(RowCategory::getName, RowCategoryDTO::setName);
                                 m.map(rc -> rc.getCategory().getCategoryId(), RowCategoryDTO::setCategoryId);
                             });
 
@@ -144,12 +144,12 @@ class RowCategoryServiceTest {
         RowCategoryDTO result = rowCategoryService.modifyRowCategory(rowCategoryId, requestDTO);
 
         System.out.println("=== 🔥 modifyRowCategory 결과 DTO ===");
-        System.out.println(result.getRowCategoryId() + " / " + result.getCategoryName());
+        System.out.println(result.getRowCategoryId() + " / " + result.getName());
 
         // 🔹 5) DTO 검증
         assertThat(result).isNotNull();
         assertThat(result.getRowCategoryId()).isEqualTo(rowCategoryId);
-        assertThat(result.getCategoryName()).isEqualTo(updatedName);
+        assertThat(result.getName()).isEqualTo(updatedName);
 
         // 🔹 6) 실제 DB 검증
         RowCategory updated = rowCategoryRepository.findById(rowCategoryId)

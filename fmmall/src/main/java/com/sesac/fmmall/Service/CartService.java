@@ -46,6 +46,9 @@ public class CartService {
         CartItem newCartItem = CartItem.createCartItem(product, requestDTO.getQuantity());
         cart.addCartItem(newCartItem);
 
+        // 수정: cart 저장 추가
+        cartRepository.save(cart);
+
         return findAllCartItems(userId);
     }
 
@@ -79,7 +82,9 @@ public class CartService {
 
         if (optCart.isEmpty()) {
             return CartResponseDTO.builder()
+                    .cartId(0)
                     .itemList(Collections.emptyList())
+                    .totalItemCount(0)
                     .totalPrice(0)
                     .build();
         }

@@ -9,5 +9,5 @@ import lombok.*;
 @Builder
 public class BrandDTO {
     private int brandId;
-    private String brandName;
+    private String name;
 }

@@ -13,12 +13,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "상품 API")
 @RestController
 @RequestMapping("/Product")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+
+    @Operation(summary = "전체 상품 조회", description = "모든 상품 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "상품 목록 조회 성공")
+    })
+    @GetMapping("/findAll")
+    public ResponseEntity<List<ProductResponseDTO>> findAll() {
+        List<ProductResponseDTO> products = productService.findAllProducts();
+        return ResponseEntity.ok(products);
+    }
 
     @Operation(summary = "상품 상세 조회", description = "상품 ID로 특정 상품의 상세 정보를 조회합니다.")
     @ApiResponses({

@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class RowCategoryDTO {
     private int rowCategoryId;
-    private String categoryName;
+    private String name;
     private int categoryId;
 
 }
