@@ -9,6 +9,8 @@ const apiClient = axios.create({
   },
 });
 
+
+
 // 요청 인터셉터 - 토큰 자동 추가
 apiClient.interceptors.request.use(
     (config) => {
@@ -138,6 +140,14 @@ export const adminProductAPI = {
     // 상품 삭제
     deleteProduct: (productId) =>
         apiClient.delete(`/Admin/Product/delete/${productId}`),
+
+    // ✅ 관리자용 브랜드 전체 조회 (apiClient 사용)
+    getAllBrands: () =>
+        apiClient.get('/Admin/Brand/findAll'),
+
+    // ✅ 관리자용 카테고리별 하위 카테고리 조회 (apiClient 사용)
+    getRowCategoriesByCategoryId: (categoryId) =>
+        apiClient.get(`/Admin/RowCategory/findByCategoryId/${categoryId}`),
 };
 
 // 장바구니 관련 API - api.js에 추가할 코드

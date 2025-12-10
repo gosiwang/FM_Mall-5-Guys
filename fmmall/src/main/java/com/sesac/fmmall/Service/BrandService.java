@@ -26,7 +26,7 @@ public class BrandService {
     public BrandDTO insertBrand(BrandDTO brandDTO) {
 
         Brand newBrand = Brand.builder()
-                .name(brandDTO.getBrandName())
+                .name(brandDTO.getName())
                 .build();
 
         Brand savedBrand = brandRepository.save(newBrand);
@@ -41,7 +41,7 @@ public class BrandService {
         Brand foundBrand = brandRepository.findById(brandId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 브랜드입니다."));
 
-        foundBrand.setName(brandDTO.getBrandName());
+        foundBrand.setName(brandDTO.getName());
 
         return modelMapper.map(foundBrand, BrandDTO.class);
     }
@@ -68,6 +68,18 @@ public class BrandService {
 
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductResponseDTO.class))
+                .toList();
+    }
+
+    /* ✅ 브랜드 전체 목록 조회 (ADMIN용) */
+    @Transactional
+    public List<BrandDTO> findAllBrands() {
+        return brandRepository.findAll()
+                .stream()
+                .map(brand -> BrandDTO.builder()
+                        .brandId(brand.getBrandId())
+                        .name(brand.getName())
+                        .build())
                 .toList();
     }
 }

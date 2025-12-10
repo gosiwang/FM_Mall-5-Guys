@@ -32,7 +32,7 @@ public class RowCategoryService {
 
         // DTO -> Entity 변환.
         RowCategory newRowCategory = RowCategory.builder()
-                .name(rowCategoryDTO.getCategoryName())
+                .name(rowCategoryDTO.getName())
                 .category(category)
                 .build();
 
@@ -49,7 +49,7 @@ public class RowCategoryService {
         RowCategory foundRowCategory = rowCategoryRepository.findById(rowCategoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 하위 카테고리 입니다."));
 
-        foundRowCategory.setName(rowCategoryDTO.getCategoryName());
+        foundRowCategory.setName(rowCategoryDTO.getName());
 
         return modelMapper.map(foundRowCategory, RowCategoryDTO.class);
     }
@@ -76,6 +76,24 @@ public class RowCategoryService {
         // Product -> ProductResponseDTO 변환
         return products.stream()
                 .map(product -> modelMapper.map(product, ProductResponseDTO.class))
+                .toList();
+    }
+
+    /* ✅ 상위 카테고리 ID로 하위 카테고리 목록 조회 (ADMIN용) */
+    @Transactional
+    public List<RowCategoryDTO> findAllByCategoryId(int categoryId) {
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상위 카테고리 입니다."));
+
+        List<RowCategory> rowCategories = rowCategoryRepository.findByCategory(category);
+
+        return rowCategories.stream()
+                .map(rc -> RowCategoryDTO.builder()
+                        .rowCategoryId(rc.getRowCategoryId())
+                        .name(rc.getName())
+                        .categoryId(rc.getCategory().getCategoryId())
+                        .build())
                 .toList();
     }
 }

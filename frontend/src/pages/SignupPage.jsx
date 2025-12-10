@@ -7,9 +7,8 @@ const SignupPage = () => {
     loginId: '',
     password: '',
     passwordConfirm: '',
-    name: '',
-    email: '',
-    phoneNumber: ''
+    userName: '',
+    userPhone: ''
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -35,9 +34,8 @@ const SignupPage = () => {
       const signupData = {
         loginId: formData.loginId,
         password: formData.password,
-        name: formData.name,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber
+        userName: formData.userName,
+        userPhone: formData.userPhone
       };
 
       await authAPI.signup(signupData);
@@ -178,8 +176,8 @@ const SignupPage = () => {
             </label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="userName"
+              value={formData.userName}
               onChange={handleChange}
               required
               style={{
@@ -193,7 +191,7 @@ const SignupPage = () => {
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
+       {/*   <div style={{ marginBottom: '1rem' }}>
             <label style={{ 
               display: 'block', 
               marginBottom: '0.5rem', 
@@ -217,7 +215,7 @@ const SignupPage = () => {
               }}
               placeholder="example@email.com"
             />
-          </div>
+          </div>*/}
 
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ 
@@ -230,8 +228,8 @@ const SignupPage = () => {
             </label>
             <input
               type="tel"
-              name="phoneNumber"
-              value={formData.phoneNumber}
+              name="userPhone"
+              value={formData.userPhone}
               onChange={handleChange}
               required
               style={{
