@@ -15,6 +15,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -95,5 +98,12 @@ public class ProductService {
             throw new IllegalArgumentException("삭제할 상품이 존재하지 않습니다.");
         }
         productRepository.deleteById(productId);
+    }
+
+    public List<ProductResponseDTO> findAllProducts() {
+        List<Product> products = productRepository.findAll();
+        return products.stream()
+                .map(product -> modelMapper.map(product, ProductResponseDTO.class))
+                .collect(Collectors.toList());
     }
 }

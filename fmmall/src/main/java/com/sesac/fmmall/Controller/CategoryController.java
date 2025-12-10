@@ -63,6 +63,17 @@ public class CategoryController {
 //        return ResponseEntity.noContent().build();
 //    }
 
+    @Operation(summary = "전체 카테고리 조회", description = "모든 카테고리 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "카테고리 목록 조회 성공")
+    })
+    @GetMapping("/findAll")
+    public ResponseEntity<List<CategoryDTO>> findAllCategories() {
+        List<CategoryDTO> categories = categoryService.findAllCategories();
+        return ResponseEntity.ok(categories);
+    }
+
+
     @Operation(summary = "카테고리별 상품 목록 조회", description = "특정 카테고리에 속한 모든 상품 목록을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "상품 목록 조회 성공"),
@@ -73,5 +84,6 @@ public class CategoryController {
         List<ProductResponseDTO> products = categoryService.findAllProductsByCategoryId(categoryId);
         return ResponseEntity.ok(products);
     }
+
 
 }

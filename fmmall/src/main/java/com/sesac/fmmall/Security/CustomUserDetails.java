@@ -3,7 +3,6 @@ package com.sesac.fmmall.Security;
 import com.sesac.fmmall.Entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -20,29 +19,17 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String roleName = "ROLE_" + user.getRole().name();  // ROLE_USER / ROLE_ADMIN
-        return List.of(new SimpleGrantedAuthority(roleName));
+        return List.of(() -> "ROLE_" + user.getRole().name());
     }
 
     @Override
-    public String getPassword() {
-        return user.getPassword();
-    }
+    public String getPassword() { return user.getPassword(); }
 
     @Override
-    public String getUsername() {
-        return user.getLoginId();
-    }
+    public String getUsername() { return user.getLoginId(); }
 
-    @Override
-    public boolean isAccountNonExpired() { return true; }
-
-    @Override
-    public boolean isAccountNonLocked() { return true; }
-
-    @Override
-    public boolean isCredentialsNonExpired() { return true; }
-
-    @Override
-    public boolean isEnabled() { return true; }
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
 }
