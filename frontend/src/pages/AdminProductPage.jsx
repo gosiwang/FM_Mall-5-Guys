@@ -58,20 +58,30 @@ const AdminProductPage = () => {
 
     const loadRowCategories = async (categoryId) => {
         try {
-            const response = await categoryAPI.getRowCategories(categoryId);
+            const response = await adminProductAPI.getRowCategoriesByCategoryId(categoryId);
+            console.log('관리자 하위 카테고리 응답:', response.data);
             setRowCategories(response.data || []);
         } catch (error) {
-            console.error('하위 카테고리 로딩 실패:', error);
+            console.error(
+                '하위 카테고리 로딩 실패:',
+                error.response?.status,
+                error.response?.data || error.message
+            );
             setRowCategories([]);
         }
     };
 
     const loadBrands = async () => {
         try {
-            const response = await categoryAPI.getAllBrands();
+            const response = await adminProductAPI.getAllBrands();
+            console.log('관리자 브랜드 응답:', response.data);
             setBrands(response.data || []);
         } catch (error) {
-            console.error('브랜드 로딩 실패:', error);
+            console.error(
+                '브랜드 로딩 실패:',
+                error.response?.status,
+                error.response?.data || error.message
+            );
         }
     };
 
@@ -309,7 +319,7 @@ const AdminProductPage = () => {
                         </option>
                         {rowCategories.map(cat => (
                             <option key={cat.rowCategoryId} value={cat.rowCategoryId}>
-                                {cat.categoryName || cat.rowCategoryName}
+                                {cat.name}
                             </option>
                         ))}
                     </select>
@@ -329,7 +339,7 @@ const AdminProductPage = () => {
                         <option value="">브랜드 선택</option>
                         {brands.map(brand => (
                             <option key={brand.brandId} value={brand.brandId}>
-                                {brand.brandName}
+                                {brand.name}
                             </option>
                         ))}
                     </select>
