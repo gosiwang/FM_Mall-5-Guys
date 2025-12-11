@@ -22,14 +22,35 @@ const MyPage = () => {
         zipcode: '',
         address1: '',
         address2: '',
-        isDefault: 'N', // 백엔드가 String "Y"/"N" 사용
+        isDefault: 'N',
+    });
+
+    // ✅ 배송지 수정 관련 상태
+    const [editingAddress, setEditingAddress] = useState(null);
+    const [showAddressEditModal, setShowAddressEditModal] = useState(false);
+    const [addressEditForm, setAddressEditForm] = useState({
+        receiverName: '',
+        receiverPhone: '',
+        zipcode: '',
+        address1: '',
+        address2: '',
+        isDefault: 'N',
     });
 
     // ✅ 결제 수단 추가 폼
     const [showPaymentForm, setShowPaymentForm] = useState(false);
     const [paymentForm, setPaymentForm] = useState({
         cardCompany: '',
-        maskedCardNumber: '', // 백엔드 DTO 필드명과 맞추기
+        maskedCardNumber: '',
+        isDefault: false,
+    });
+
+    // ✅ 결제 수단 수정 관련 상태
+    const [editingPayment, setEditingPayment] = useState(null);
+    const [showPaymentEditModal, setShowPaymentEditModal] = useState(false);
+    const [paymentEditForm, setPaymentEditForm] = useState({
+        cardCompany: '',
+        maskedCardNumber: '',
         isDefault: false,
     });
 
@@ -97,7 +118,6 @@ const MyPage = () => {
         }
     };
 
-    // ✅ 리뷰 목록 로딩
     const loadReviews = async () => {
         try {
             const response = await reviewAPI.getMyReviews(currentPage);
@@ -142,10 +162,85 @@ const MyPage = () => {
                 address2: '',
                 isDefault: 'N',
             });
-            loadAddresses(); // 목록 새로고침
+            loadAddresses();
         } catch (error) {
             console.error('배송지 추가 실패:', error);
             alert('배송지 추가에 실패했습니다.');
+        }
+    };
+
+    // =============================
+    // 배송지 수정 관련
+    // =============================
+    const handleOpenAddressEditModal = (address) => {
+        setEditingAddress(address);
+        setAddressEditForm({
+            receiverName: address.receiverName,
+            receiverPhone: address.receiverPhone,
+            zipcode: address.zipcode,
+            address1: address.address1,
+            address2: address.address2,
+            isDefault: address.isDefault,
+        });
+        setShowAddressEditModal(true);
+    };
+
+    const handleCloseAddressEditModal = () => {
+        setShowAddressEditModal(false);
+        setEditingAddress(null);
+        setAddressEditForm({
+            receiverName: '',
+            receiverPhone: '',
+            zipcode: '',
+            address1: '',
+            address2: '',
+            isDefault: 'N',
+        });
+    };
+
+    const handleAddressEditFormChange = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        if (name === 'isDefault') {
+            setAddressEditForm((prev) => ({
+                ...prev,
+                isDefault: checked ? 'Y' : 'N',
+            }));
+            return;
+        }
+
+        setAddressEditForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmitAddressEdit = async (e) => {
+        e.preventDefault();
+
+        if (!editingAddress) return;
+
+        try {
+            await addressAPI.updateAddress(editingAddress.id, addressEditForm);
+            alert('배송지가 수정되었습니다.');
+            handleCloseAddressEditModal();
+            loadAddresses();
+        } catch (error) {
+            console.error('배송지 수정 실패:', error);
+            alert('배송지 수정에 실패했습니다.');
+        }
+    };
+
+    const handleDeleteAddress = async (addressId) => {
+        if (!window.confirm('이 배송지를 삭제하시겠습니까?')) return;
+
+        try {
+            await addressAPI.deleteAddress(addressId);
+            alert('배송지가 삭제되었습니다.');
+            loadAddresses();
+        } catch (error) {
+            console.error('배송지 삭제 실패:', error);
+            alert('배송지 삭제에 실패했습니다.');
         }
     };
 
@@ -172,13 +267,77 @@ const MyPage = () => {
                 maskedCardNumber: '',
                 isDefault: false,
             });
-            loadPayments(); // 목록 새로고침
+            loadPayments();
         } catch (error) {
             console.error('결제 수단 추가 실패:', error);
             alert('결제 수단 추가에 실패했습니다.');
         }
     };
 
+    // =============================
+    // 결제 수단 수정 관련
+    // =============================
+    const handleOpenPaymentEditModal = (payment) => {
+        setEditingPayment(payment);
+        setPaymentEditForm({
+            cardCompany: payment.cardCompany,
+            maskedCardNumber: payment.maskedCardNumber,
+            isDefault: payment.isDefault,
+        });
+        setShowPaymentEditModal(true);
+    };
+
+    const handleClosePaymentEditModal = () => {
+        setShowPaymentEditModal(false);
+        setEditingPayment(null);
+        setPaymentEditForm({
+            cardCompany: '',
+            maskedCardNumber: '',
+            isDefault: false,
+        });
+    };
+
+    const handlePaymentEditFormChange = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        setPaymentEditForm((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
+    };
+
+    const handleSubmitPaymentEdit = async (e) => {
+        e.preventDefault();
+
+        if (!editingPayment) return;
+
+        try {
+            await paymentAPI.updatePayment(editingPayment.id, paymentEditForm);
+            alert('결제 수단이 수정되었습니다.');
+            handleClosePaymentEditModal();
+            loadPayments();
+        } catch (error) {
+            console.error('결제 수단 수정 실패:', error);
+            alert('결제 수단 수정에 실패했습니다.');
+        }
+    };
+
+    const handleDeletePayment = async (paymentMethodId) => {
+        if (!window.confirm('이 결제 수단을 삭제하시겠습니까?')) return;
+
+        try {
+            await paymentAPI.deletePayment(paymentMethodId);
+            alert('결제 수단이 삭제되었습니다.');
+            loadPayments();
+        } catch (error) {
+            console.error('결제 수단 삭제 실패:', error);
+            alert('결제 수단 삭제에 실패했습니다.');
+        }
+    };
+
+    // =============================
+    // 사용자 정보 수정 관련
+    // =============================
     const handleUpdateInfo = async () => {
         try {
             await authAPI.updateUser(editForm);
@@ -209,33 +368,9 @@ const MyPage = () => {
         }
     };
 
-    const handleDeleteAddress = async (addressId) => {
-        if (!window.confirm('이 주소를 삭제하시겠습니까?')) return;
-
-        try {
-            await addressAPI.deleteAddress(addressId);
-            alert('주소가 삭제되었습니다.');
-            loadAddresses();
-        } catch (error) {
-            console.error('주소 삭제 실패:', error);
-            alert('주소 삭제에 실패했습니다.');
-        }
-    };
-
-    const handleDeletePayment = async (paymentMethodId) => {
-        if (!window.confirm('이 결제 수단을 삭제하시겠습니까?')) return;
-
-        try {
-            await paymentAPI.deletePayment(paymentMethodId);
-            alert('결제 수단이 삭제되었습니다.');
-            loadPayments();
-        } catch (error) {
-            console.error('결제 수단 삭제 실패:', error);
-            alert('결제 수단 삭제에 실패했습니다.');
-        }
-    };
-
-    // ✅ 리뷰 수정 모달 열기
+    // =============================
+    // 리뷰 관련
+    // =============================
     const handleOpenReviewEditModal = (review) => {
         setEditingReview(review);
         setReviewEditForm({
@@ -245,7 +380,6 @@ const MyPage = () => {
         setShowReviewEditModal(true);
     };
 
-    // ✅ 리뷰 수정 모달 닫기
     const handleCloseReviewEditModal = () => {
         setShowReviewEditModal(false);
         setEditingReview(null);
@@ -255,7 +389,6 @@ const MyPage = () => {
         });
     };
 
-    // ✅ 리뷰 수정 제출
     const handleSubmitReviewEdit = async (e) => {
         e.preventDefault();
 
@@ -275,7 +408,6 @@ const MyPage = () => {
         }
     };
 
-    // ✅ 리뷰 삭제
     const handleDeleteReview = async (reviewId) => {
         if (!window.confirm('이 리뷰를 삭제하시겠습니까?')) return;
 
@@ -335,7 +467,7 @@ const MyPage = () => {
                             marginBottom: '-2px'
                         }}
                     >
-                        배송지
+                        배송지 관리
                     </button>
                     <button
                         onClick={() => setActiveTab('payment')}
@@ -376,7 +508,7 @@ const MyPage = () => {
                             marginBottom: '-2px'
                         }}
                     >
-                        ⭐ 내 리뷰
+                        내 리뷰
                     </button>
                 </div>
 
@@ -385,72 +517,79 @@ const MyPage = () => {
                     <div>
                         {!isEditing ? (
                             <div>
-                                <div style={{ marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid #e5e7eb' }}>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>
-                                        아이디
-                                    </label>
-                                    <div style={{ fontSize: '1rem' }}>{userInfo.loginId}</div>
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                        <h3 style={{ fontSize: '1.25rem', fontWeight: '600' }}>계정 정보</h3>
+                                        <button onClick={() => setIsEditing(true)} className="btn btn--ghost">
+                                            수정
+                                        </button>
+                                    </div>
+                                    <div style={{ display: 'grid', gap: '1rem' }}>
+                                        <div>
+                                            <div style={{ fontWeight: '500', marginBottom: '0.25rem', color: '#6b7280', fontSize: '0.875rem' }}>이메일</div>
+                                            <div>{userInfo.userEmail}</div>
+                                        </div>
+                                        <div>
+                                            <div style={{ fontWeight: '500', marginBottom: '0.25rem', color: '#6b7280', fontSize: '0.875rem' }}>이름</div>
+                                            <div>{userInfo.userName}</div>
+                                        </div>
+                                        <div>
+                                            <div style={{ fontWeight: '500', marginBottom: '0.25rem', color: '#6b7280', fontSize: '0.875rem' }}>전화번호</div>
+                                            <div>{userInfo.userPhone}</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style={{ marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid #e5e7eb' }}>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>
-                                        이름
-                                    </label>
-                                    <div style={{ fontSize: '1rem' }}>{userInfo.userName}</div>
-                                </div>
-                                <div style={{ marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid #e5e7eb' }}>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>
-                                        전화번호
-                                    </label>
-                                    <div style={{ fontSize: '1rem' }}>{userInfo.userPhone || '미등록'}</div>
-                                </div>
-                                <div style={{ marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid #e5e7eb' }}>
-                                    <label style={{ display: 'block', fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>
-                                        권한
-                                    </label>
-                                    <div style={{ fontSize: '1rem' }}>{userInfo.role === 'ADMIN' ? '관리자' : '일반 회원'}</div>
-                                </div>
-                                <div style={{ display: 'flex', gap: '1rem' }}>
-                                    <button onClick={() => setIsEditing(true)} className="btn btn--primary">
-                                        정보 수정
-                                    </button>
-                                    <button onClick={handleDeleteAccount} className="btn btn--outline" style={{ borderColor: '#ef4444', color: '#ef4444' }}>
-                                        회원 탈퇴
-                                    </button>
-                                </div>
+                                <button onClick={handleDeleteAccount} className="btn btn--outline" style={{ borderColor: '#ef4444', color: '#ef4444' }}>
+                                    회원 탈퇴
+                                </button>
                             </div>
                         ) : (
                             <div>
-                                <div style={{ marginBottom: '1.5rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                                        이름
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={editForm.userName || ''}
-                                        onChange={(e) => setEditForm({ ...editForm, userName: e.target.value })}
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.75rem',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '0.5rem'
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ marginBottom: '1.5rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                                        전화번호
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        value={editForm.userPhone || ''}
-                                        onChange={(e) => setEditForm({ ...editForm, userPhone: e.target.value })}
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.75rem',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '0.5rem'
-                                        }}
-                                    />
+                                <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem' }}>정보 수정</h3>
+                                <div style={{ display: 'grid', gap: '1rem', marginBottom: '1.5rem' }}>
+                               {/*     <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>이메일 (변경 불가)</label>
+                                        <input
+                                            type="email"
+                                            value={editForm.userEmail || ''}
+                                            disabled
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.5rem',
+                                                backgroundColor: '#f3f4f6'
+                                            }}
+                                        />
+                                    </div>*/}
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>이름</label>
+                                        <input
+                                            type="text"
+                                            value={editForm.userName || ''}
+                                            onChange={(e) => setEditForm({ ...editForm, userName: e.target.value })}
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.5rem'
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>전화번호</label>
+                                        <input
+                                            type="tel"
+                                            value={editForm.userPhone || ''}
+                                            onChange={(e) => setEditForm({ ...editForm, userPhone: e.target.value })}
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.5rem'
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                                 <div style={{ display: 'flex', gap: '1rem' }}>
                                     <button onClick={handleUpdateInfo} className="btn btn--primary">
@@ -480,7 +619,7 @@ const MyPage = () => {
                                 className="btn btn--primary"
                                 onClick={() => setShowAddressForm((prev) => !prev)}
                             >
-                                + 배송지 추가
+                                {showAddressForm ? '취소' : '+ 배송지 추가'}
                             </button>
                         </div>
 
@@ -489,82 +628,117 @@ const MyPage = () => {
                             <form
                                 onSubmit={handleSubmitAddress}
                                 style={{
-                                    marginBottom: '1.5rem',
-                                    padding: '1rem',
-                                    border: '1px solid #e5e7eb',
-                                    borderRadius: '0.5rem',
+                                    padding: '1.5rem',
                                     backgroundColor: '#f9fafb',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '0.5rem',
+                                    borderRadius: '0.75rem',
+                                    marginBottom: '1.5rem',
+                                    border: '1px solid #e5e7eb'
                                 }}
                             >
-                                <div>
-                                    <label>받는 사람 이름</label>
-                                    <input
-                                        name="receiverName"
-                                        value={addressForm.receiverName}
-                                        onChange={handleAddressFormChange}
-                                        className="input"
-                                        required
-                                    />
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '1rem' }}>새 배송지 추가</h4>
+                                <div style={{ display: 'grid', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>받는 사람</label>
+                                        <input
+                                            type="text"
+                                            name="receiverName"
+                                            value={addressForm.receiverName}
+                                            onChange={handleAddressFormChange}
+                                            required
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.5rem',
+                                                fontSize: '0.95rem'
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>연락처</label>
+                                        <input
+                                            type="tel"
+                                            name="receiverPhone"
+                                            value={addressForm.receiverPhone}
+                                            onChange={handleAddressFormChange}
+                                            required
+                                            placeholder="010-0000-0000"
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.5rem',
+                                                fontSize: '0.95rem'
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>우편번호</label>
+                                        <input
+                                            type="text"
+                                            name="zipcode"
+                                            value={addressForm.zipcode}
+                                            onChange={handleAddressFormChange}
+                                            required
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.5rem',
+                                                fontSize: '0.95rem'
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>주소</label>
+                                        <input
+                                            type="text"
+                                            name="address1"
+                                            value={addressForm.address1}
+                                            onChange={handleAddressFormChange}
+                                            required
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.5rem',
+                                                fontSize: '0.95rem'
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>상세주소</label>
+                                        <input
+                                            type="text"
+                                            name="address2"
+                                            value={addressForm.address2}
+                                            onChange={handleAddressFormChange}
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.5rem',
+                                                fontSize: '0.95rem'
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <input
+                                            type="checkbox"
+                                            name="isDefault"
+                                            checked={addressForm.isDefault === 'Y'}
+                                            onChange={handleAddressFormChange}
+                                            style={{ width: '1.1rem', height: '1.1rem' }}
+                                        />
+                                        <label style={{ fontWeight: '500', fontSize: '0.9rem' }}>기본 배송지로 설정</label>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label>전화번호</label>
-                                    <input
-                                        name="receiverPhone"
-                                        value={addressForm.receiverPhone}
-                                        onChange={handleAddressFormChange}
-                                        className="input"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label>우편번호</label>
-                                    <input
-                                        name="zipcode"
-                                        value={addressForm.zipcode}
-                                        onChange={handleAddressFormChange}
-                                        className="input"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label>주소</label>
-                                    <input
-                                        name="address1"
-                                        value={addressForm.address1}
-                                        onChange={handleAddressFormChange}
-                                        className="input"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label>상세 주소</label>
-                                    <input
-                                        name="address2"
-                                        value={addressForm.address2}
-                                        onChange={handleAddressFormChange}
-                                        className="input"
-                                    />
-                                </div>
-                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <input
-                                        type="checkbox"
-                                        name="isDefault"
-                                        checked={addressForm.isDefault === 'Y'}
-                                        onChange={handleAddressFormChange}
-                                    />
-                                    기본 배송지로 설정
-                                </label>
-                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                    <button type="submit" className="btn btn--primary">
-                                        저장
-                                    </button>
+                                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
+                                    <button type="submit" className="btn btn--primary">추가</button>
                                     <button
                                         type="button"
-                                        className="btn btn--ghost"
                                         onClick={() => setShowAddressForm(false)}
+                                        className="btn btn--ghost"
                                     >
                                         취소
                                     </button>
@@ -572,6 +746,7 @@ const MyPage = () => {
                             </form>
                         )}
 
+                        {/* 배송지 목록 */}
                         {addresses.length === 0 ? (
                             <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>
                                 등록된 배송지가 없습니다.
@@ -584,19 +759,20 @@ const MyPage = () => {
                                         style={{
                                             padding: '1.25rem',
                                             border: '1px solid #e5e7eb',
-                                            borderRadius: '0.5rem',
+                                            borderRadius: '0.75rem',
                                             backgroundColor: '#f9fafb'
                                         }}
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                                            <div style={{ fontWeight: '500' }}>{address.receiverName}</div>
+                                            <div style={{ fontWeight: '600', fontSize: '1.05rem' }}>{address.receiverName}</div>
                                             {address.isDefault === 'Y' && (
                                                 <span style={{
                                                     padding: '0.125rem 0.5rem',
                                                     backgroundColor: '#dbeafe',
                                                     color: '#1e40af',
                                                     borderRadius: '0.25rem',
-                                                    fontSize: '0.75rem'
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '600'
                                                 }}>
                                                     기본
                                                 </span>
@@ -609,7 +785,11 @@ const MyPage = () => {
                                             {address.receiverPhone}
                                         </div>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button className="btn btn--ghost" style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}>
+                                            <button
+                                                onClick={() => handleOpenAddressEditModal(address)}
+                                                className="btn btn--ghost"
+                                                style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
+                                            >
                                                 수정
                                             </button>
                                             <button
@@ -636,7 +816,7 @@ const MyPage = () => {
                                 className="btn btn--primary"
                                 onClick={() => setShowPaymentForm((prev) => !prev)}
                             >
-                                + 결제 수단 추가
+                                {showPaymentForm ? '취소' : '+ 결제 수단 추가'}
                             </button>
                         </div>
 
@@ -645,53 +825,68 @@ const MyPage = () => {
                             <form
                                 onSubmit={handleSubmitPayment}
                                 style={{
-                                    marginBottom: '1.5rem',
-                                    padding: '1rem',
-                                    border: '1px solid #e5e7eb',
-                                    borderRadius: '0.5rem',
+                                    padding: '1.5rem',
                                     backgroundColor: '#f9fafb',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '0.5rem',
+                                    borderRadius: '0.75rem',
+                                    marginBottom: '1.5rem',
+                                    border: '1px solid #e5e7eb'
                                 }}
                             >
-                                <div>
-                                    <label>카드사</label>
-                                    <input
-                                        name="cardCompany"
-                                        value={paymentForm.cardCompany}
-                                        onChange={handlePaymentFormChange}
-                                        className="input"
-                                        required
-                                    />
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '1rem' }}>새 결제 수단 추가</h4>
+                                <div style={{ display: 'grid', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>카드사</label>
+                                        <input
+                                            type="text"
+                                            name="cardCompany"
+                                            value={paymentForm.cardCompany}
+                                            onChange={handlePaymentFormChange}
+                                            required
+                                            placeholder="예: 신한카드, KB국민카드"
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.5rem',
+                                                fontSize: '0.95rem'
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>카드번호 (마스킹)</label>
+                                        <input
+                                            type="text"
+                                            name="maskedCardNumber"
+                                            value={paymentForm.maskedCardNumber}
+                                            onChange={handlePaymentFormChange}
+                                            required
+                                            placeholder="예: 1234-****-****-5678"
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.5rem',
+                                                fontSize: '0.95rem'
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <input
+                                            type="checkbox"
+                                            name="isDefault"
+                                            checked={paymentForm.isDefault}
+                                            onChange={handlePaymentFormChange}
+                                            style={{ width: '1.1rem', height: '1.1rem' }}
+                                        />
+                                        <label style={{ fontWeight: '500', fontSize: '0.9rem' }}>기본 결제 수단으로 설정</label>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label>표시용 카드 번호 (예: ****-****-****-1234)</label>
-                                    <input
-                                        name="maskedCardNumber"
-                                        value={paymentForm.maskedCardNumber}
-                                        onChange={handlePaymentFormChange}
-                                        className="input"
-                                        required
-                                    />
-                                </div>
-                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <input
-                                        type="checkbox"
-                                        name="isDefault"
-                                        checked={paymentForm.isDefault}
-                                        onChange={handlePaymentFormChange}
-                                    />
-                                    기본 결제 수단으로 설정
-                                </label>
-                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                    <button type="submit" className="btn btn--primary">
-                                        저장
-                                    </button>
+                                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
+                                    <button type="submit" className="btn btn--primary">추가</button>
                                     <button
                                         type="button"
-                                        className="btn btn--ghost"
                                         onClick={() => setShowPaymentForm(false)}
+                                        className="btn btn--ghost"
                                     >
                                         취소
                                     </button>
@@ -699,6 +894,7 @@ const MyPage = () => {
                             </form>
                         )}
 
+                        {/* 결제 수단 목록 */}
                         {payments.length === 0 ? (
                             <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>
                                 등록된 결제 수단이 없습니다.
@@ -711,19 +907,20 @@ const MyPage = () => {
                                         style={{
                                             padding: '1.25rem',
                                             border: '1px solid #e5e7eb',
-                                            borderRadius: '0.5rem',
+                                            borderRadius: '0.75rem',
                                             backgroundColor: '#f9fafb'
                                         }}
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                                            <div style={{ fontWeight: '500' }}>{payment.cardCompany}</div>
+                                            <div style={{ fontWeight: '600', fontSize: '1.05rem' }}>{payment.cardCompany}</div>
                                             {payment.isDefault && (
                                                 <span style={{
                                                     padding: '0.125rem 0.5rem',
                                                     backgroundColor: '#dbeafe',
                                                     color: '#1e40af',
                                                     borderRadius: '0.25rem',
-                                                    fontSize: '0.75rem'
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '600'
                                                 }}>
                                                     기본
                                                 </span>
@@ -733,7 +930,11 @@ const MyPage = () => {
                                             {payment.maskedCardNumber}
                                         </div>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button className="btn btn--ghost" style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}>
+                                            <button
+                                                onClick={() => handleOpenPaymentEditModal(payment)}
+                                                className="btn btn--ghost"
+                                                style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
+                                            >
                                                 수정
                                             </button>
                                             <button
@@ -751,24 +952,15 @@ const MyPage = () => {
                     </div>
                 )}
 
-                {/* ✅ 내 리뷰 관리 탭 */}
+                {/* 내 리뷰 탭 */}
                 {activeTab === 'reviews' && (
                     <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: '600' }}>내 리뷰</h3>
-                            <button onClick={() => navigate('/orders')} className="btn btn--ghost">
-                                주문 내역에서 작성
-                            </button>
-                        </div>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem' }}>내가 작성한 리뷰</h3>
+
                         {reviews.length === 0 ? (
-                            <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: '#f9fafb', borderRadius: '0.75rem' }}>
-                                <p style={{ fontSize: '1rem', color: '#6b7280', marginBottom: '1rem' }}>
-                                    작성한 리뷰가 없습니다.
-                                </p>
-                                <button onClick={() => navigate('/orders')} className="btn btn--primary">
-                                    주문 내역에서 리뷰 작성하기
-                                </button>
-                            </div>
+                            <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>
+                                작성한 리뷰가 없습니다.
+                            </p>
                         ) : (
                             <>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -776,21 +968,24 @@ const MyPage = () => {
                                         <div
                                             key={review.reviewId}
                                             style={{
-                                                padding: '1.5rem',
+                                                padding: '1.25rem',
                                                 border: '1px solid #e5e7eb',
-                                                borderRadius: '0.5rem',
-                                                backgroundColor: '#ffffff'
+                                                borderRadius: '0.75rem',
+                                                backgroundColor: '#f9fafb'
                                             }}
                                         >
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                                                <div>
-                                                    <div style={{ fontSize: '1.25rem', marginBottom: '0.25rem' }}>
-                                                        {'⭐'.repeat(Math.floor(review.reviewRating))} {review.reviewRating}
-                                                    </div>
-                                                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                                                        {new Date(review.createdAt).toLocaleDateString('ko-KR')}
-                                                        {review.updatedAt !== review.createdAt && ' (수정됨)'}
-                                                    </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                                                <div style={{ fontWeight: '600' }}>{review.productName}</div>
+                                                <div style={{ color: '#f59e0b', fontSize: '0.9rem' }}>
+                                                    ⭐ {review.reviewRating}
+                                                </div>
+                                            </div>
+                                            <div style={{ color: '#374151', marginBottom: '0.75rem', lineHeight: '1.6' }}>
+                                                {review.reviewContent}
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div style={{ color: '#9ca3af', fontSize: '0.8rem' }}>
+                                                    {new Date(review.createdAt).toLocaleDateString()}
                                                 </div>
                                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                     <button
@@ -809,36 +1004,28 @@ const MyPage = () => {
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div style={{ fontSize: '0.95rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
-                                                {review.reviewContent}
-                                            </div>
                                         </div>
                                     ))}
                                 </div>
 
                                 {/* 페이지네이션 */}
                                 {totalPages > 1 && (
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        gap: '0.5rem',
-                                        marginTop: '2rem'
-                                    }}>
+                                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '2rem' }}>
                                         <button
-                                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                             disabled={currentPage === 1}
-                                            className="btn btn--outline"
+                                            className="btn btn--ghost"
                                             style={{ padding: '0.5rem 1rem' }}
                                         >
                                             이전
                                         </button>
-                                        <span style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center' }}>
+                                        <span style={{ padding: '0.5rem 1rem', fontWeight: '500' }}>
                                             {currentPage} / {totalPages}
                                         </span>
                                         <button
-                                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                             disabled={currentPage === totalPages}
-                                            className="btn btn--outline"
+                                            className="btn btn--ghost"
                                             style={{ padding: '0.5rem 1rem' }}
                                         >
                                             다음
@@ -849,103 +1036,308 @@ const MyPage = () => {
                         )}
                     </div>
                 )}
+            </div>
 
-                {/* ✅ 리뷰 수정 모달 */}
-                {showReviewEditModal && editingReview && (
+            {/* ✅ 배송지 수정 모달 */}
+            {showAddressEditModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
                     <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000
+                        backgroundColor: '#ffffff',
+                        borderRadius: '1rem',
+                        padding: '2rem',
+                        maxWidth: '500px',
+                        width: '90%',
+                        maxHeight: '90vh',
+                        overflowY: 'auto'
                     }}>
-                        <div style={{
-                            backgroundColor: '#ffffff',
-                            borderRadius: '1rem',
-                            padding: '2rem',
-                            maxWidth: '500px',
-                            width: '90%',
-                            maxHeight: '80vh',
-                            overflow: 'auto'
-                        }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1.5rem' }}>
-                                리뷰 수정
-                            </h2>
-
-                            <form onSubmit={handleSubmitReviewEdit}>
-                                {/* 평점 */}
-                                <div style={{ marginBottom: '1.5rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                                        평점
-                                    </label>
-                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                        <input
-                                            type="range"
-                                            min="0.5"
-                                            max="5.0"
-                                            step="0.5"
-                                            value={reviewEditForm.reviewRating}
-                                            onChange={(e) => setReviewEditForm({
-                                                ...reviewEditForm,
-                                                reviewRating: parseFloat(e.target.value)
-                                            })}
-                                            style={{ flex: 1 }}
-                                        />
-                                        <span style={{ fontSize: '1.25rem', fontWeight: '600', minWidth: '3rem' }}>
-                                            {'⭐'.repeat(Math.floor(reviewEditForm.reviewRating))} {reviewEditForm.reviewRating}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* 리뷰 내용 */}
-                                <div style={{ marginBottom: '1.5rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                                        리뷰 내용
-                                    </label>
-                                    <textarea
-                                        value={reviewEditForm.reviewContent}
-                                        onChange={(e) => setReviewEditForm({ ...reviewEditForm, reviewContent: e.target.value })}
-                                        placeholder="상품에 대한 솔직한 리뷰를 작성해주세요."
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem' }}>배송지 수정</h3>
+                        <form onSubmit={handleSubmitAddressEdit}>
+                            <div style={{ display: 'grid', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>받는 사람</label>
+                                    <input
+                                        type="text"
+                                        name="receiverName"
+                                        value={addressEditForm.receiverName}
+                                        onChange={handleAddressEditFormChange}
                                         required
-                                        rows="6"
                                         style={{
                                             width: '100%',
                                             padding: '0.75rem',
                                             border: '1px solid #d1d5db',
                                             borderRadius: '0.5rem',
+                                            fontSize: '0.95rem'
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>연락처</label>
+                                    <input
+                                        type="tel"
+                                        name="receiverPhone"
+                                        value={addressEditForm.receiverPhone}
+                                        onChange={handleAddressEditFormChange}
+                                        required
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '0.5rem',
+                                            fontSize: '0.95rem'
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>우편번호</label>
+                                    <input
+                                        type="text"
+                                        name="zipcode"
+                                        value={addressEditForm.zipcode}
+                                        onChange={handleAddressEditFormChange}
+                                        required
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '0.5rem',
+                                            fontSize: '0.95rem'
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>주소</label>
+                                    <input
+                                        type="text"
+                                        name="address1"
+                                        value={addressEditForm.address1}
+                                        onChange={handleAddressEditFormChange}
+                                        required
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '0.5rem',
+                                            fontSize: '0.95rem'
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>상세주소</label>
+                                    <input
+                                        type="text"
+                                        name="address2"
+                                        value={addressEditForm.address2}
+                                        onChange={handleAddressEditFormChange}
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '0.5rem',
+                                            fontSize: '0.95rem'
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        name="isDefault"
+                                        checked={addressEditForm.isDefault === 'Y'}
+                                        onChange={handleAddressEditFormChange}
+                                        style={{ width: '1.1rem', height: '1.1rem' }}
+                                    />
+                                    <label style={{ fontWeight: '500', fontSize: '0.9rem' }}>기본 배송지로 설정</label>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+                                <button type="submit" className="btn btn--primary">저장</button>
+                                <button
+                                    type="button"
+                                    onClick={handleCloseAddressEditModal}
+                                    className="btn btn--ghost"
+                                >
+                                    취소
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* ✅ 결제 수단 수정 모달 */}
+            {showPaymentEditModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '1rem',
+                        padding: '2rem',
+                        maxWidth: '500px',
+                        width: '90%',
+                        maxHeight: '90vh',
+                        overflowY: 'auto'
+                    }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem' }}>결제 수단 수정</h3>
+                        <form onSubmit={handleSubmitPaymentEdit}>
+                            <div style={{ display: 'grid', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>카드사</label>
+                                    <input
+                                        type="text"
+                                        name="cardCompany"
+                                        value={paymentEditForm.cardCompany}
+                                        onChange={handlePaymentEditFormChange}
+                                        required
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '0.5rem',
+                                            fontSize: '0.95rem'
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>카드번호 (마스킹)</label>
+                                    <input
+                                        type="text"
+                                        name="maskedCardNumber"
+                                        value={paymentEditForm.maskedCardNumber}
+                                        onChange={handlePaymentEditFormChange}
+                                        required
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '0.5rem',
+                                            fontSize: '0.95rem'
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        name="isDefault"
+                                        checked={paymentEditForm.isDefault}
+                                        onChange={handlePaymentEditFormChange}
+                                        style={{ width: '1.1rem', height: '1.1rem' }}
+                                    />
+                                    <label style={{ fontWeight: '500', fontSize: '0.9rem' }}>기본 결제 수단으로 설정</label>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+                                <button type="submit" className="btn btn--primary">저장</button>
+                                <button
+                                    type="button"
+                                    onClick={handleClosePaymentEditModal}
+                                    className="btn btn--ghost"
+                                >
+                                    취소
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* ✅ 리뷰 수정 모달 */}
+            {showReviewEditModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '1rem',
+                        padding: '2rem',
+                        maxWidth: '500px',
+                        width: '90%',
+                        maxHeight: '90vh',
+                        overflowY: 'auto'
+                    }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem' }}>리뷰 수정</h3>
+                        <form onSubmit={handleSubmitReviewEdit}>
+                            <div style={{ display: 'grid', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>평점</label>
+                                    <select
+                                        value={reviewEditForm.reviewRating}
+                                        onChange={(e) => setReviewEditForm({ ...reviewEditForm, reviewRating: parseFloat(e.target.value) })}
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '0.5rem',
+                                            fontSize: '0.95rem'
+                                        }}
+                                    >
+                                        <option value="5.0">⭐⭐⭐⭐⭐ (5.0)</option>
+                                        <option value="4.0">⭐⭐⭐⭐ (4.0)</option>
+                                        <option value="3.0">⭐⭐⭐ (3.0)</option>
+                                        <option value="2.0">⭐⭐ (2.0)</option>
+                                        <option value="1.0">⭐ (1.0)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>리뷰 내용</label>
+                                    <textarea
+                                        value={reviewEditForm.reviewContent}
+                                        onChange={(e) => setReviewEditForm({ ...reviewEditForm, reviewContent: e.target.value })}
+                                        required
+                                        rows={5}
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '0.5rem',
+                                            fontSize: '0.95rem',
                                             resize: 'vertical'
                                         }}
                                     />
                                 </div>
-
-                                {/* 버튼 */}
-                                <div style={{ display: 'flex', gap: '1rem' }}>
-                                    <button
-                                        type="submit"
-                                        className="btn btn--primary"
-                                        style={{ flex: 1 }}
-                                    >
-                                        수정 완료
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleCloseReviewEditModal}
-                                        className="btn btn--ghost"
-                                        style={{ flex: 1 }}
-                                    >
-                                        취소
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+                                <button type="submit" className="btn btn--primary">저장</button>
+                                <button
+                                    type="button"
+                                    onClick={handleCloseReviewEditModal}
+                                    className="btn btn--ghost"
+                                >
+                                    취소
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </main>
     );
 };
