@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cartAPI } from '../services/api';
+import { cartAPI, wishlistAPI } from '../services/api';
 
 const ProductCard = ({ product }) => {
     const navigate = useNavigate();
+    const [isWishlisted, setIsWishlisted] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const handleCardClick = () => {
         navigate(`/product/${product.productId}`);
@@ -46,14 +48,85 @@ const ProductCard = ({ product }) => {
         }
     };
 
+    const handleWishlistToggle = async (e) => {
+        e.stopPropagation();
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('로그인이 필요한 서비스입니다.');
+            navigate('/login');
+            return;
+        }
+
+        if (isProcessing) return;
+
+        try {
+            setIsProcessing(true);
+            const response = await wishlistAPI.toggleWishlist({
+                productId: product.productId
+            });
+
+            // ✅ 수정: isAdded 또는 added 둘 다 확인
+            console.log('위시리스트 응답:', response.data); // 👈 디버깅용
+            const isAdded = response.data.isAdded ?? response.data.added;
+
+            setIsWishlisted(isAdded);
+
+            if (isAdded) {
+                alert('위시리스트에 추가되었습니다.');
+            } else {
+                alert('위시리스트에서 제거되었습니다.');
+            }
+        } catch (error) {
+            console.error('위시리스트 토글 실패:', error);
+            if (error.response?.status === 401) {
+                alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+                localStorage.removeItem('token');
+                navigate('/login');
+            } else {
+                alert('위시리스트 처리 중 오류가 발생했습니다.');
+            }
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     return (
-        <article className="product-card" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
+        <article className="product-card" onClick={handleCardClick} style={{ cursor: 'pointer', position: 'relative' }}>
             {product.isNew && (
                 <div className="product-card__badge">NEW</div>
             )}
             {product.isHot && (
                 <div className="product-card__badge product-card__badge--green">HOT</div>
             )}
+
+            {/* ✅ 위시리스트 버튼 추가 */}
+            <button
+                className={`product-card__wishlist ${isWishlisted ? 'product-card__wishlist--active' : ''}`}
+                onClick={handleWishlistToggle}
+                disabled={isProcessing}
+                title={isWishlisted ? '위시리스트에서 제거' : '위시리스트에 추가'}
+                style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    borderRadius: '50%',
+                    border: 'none',
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    cursor: 'pointer',
+                    fontSize: '1.3rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    transition: 'all 0.2s',
+                    zIndex: 10
+                }}
+            >
+                {isWishlisted ? '❤️' : '🤍'}
+            </button>
 
             <div className="product-card__image">
                 {product.imageUrl ? (
