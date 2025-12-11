@@ -18,6 +18,10 @@ public interface WishListRepository extends JpaRepository<WishList, Integer> {
 //    Optional<Integer> findByUser_UserIdAndProduct_ProductId(int userId, int productId);
     Page<WishList> findAllByUser_UserId(int userId, Pageable pageable);
 
+    @Modifying // DML(Insert, Update, Delete) 쿼리임을 명시
+    @Transactional // 삭제는 별도의 트랜잭션에서 관리하거나 서비스의 트랜잭션을 따라감
+    int deleteByUser_UserIdAndProduct_ProductId(int userId, int productId); // 직접 삭제
+
     @Modifying
     @Transactional
     @Query(value = "ALTER TABLE wish_list AUTO_INCREMENT = 1", nativeQuery = true)
