@@ -148,8 +148,10 @@ a {
     grid-template-columns: 260px 1fr;
     gap: 1.5rem;
 
-    /* body flex 컬럼에서 남는 공간을 쭉 차지 */
     flex: 1 0 auto;
+
+    /* 이 줄 추가 (footer 높이에 맞게 조정) */
+    padding-bottom: 140px;
 }
 
 /* 사이드바 */
@@ -372,19 +374,17 @@ a {
 
 /* 푸터 */
 .footer {
-    position: fixed;      /* 화면에 고정 */
+    position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     width: 100%;
-
     border-top: 1px solid #e5e7eb;
     padding: 1.2rem 1rem 1.5rem;
     background-color: #ffffff;
-
-    margin-top: 0;        /* 고정이므로 필요 없음 */
-    z-index: 20;          /* 헤더/내용 위에 떠 있게 (필요시) */
+    z-index: 20;
 }
+
 
 
 .footer__inner {
