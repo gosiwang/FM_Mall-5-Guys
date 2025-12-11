@@ -46,20 +46,40 @@ const MainPage = () => {
         setTimeout(() => setIntroComplete(true), 500);
     };
 
+
     const handleFilterChange = (filters) => {
         let filtered = [...products];
 
-        if (filters.categoryId) {
+        // 1) 카테고리
+        if (filters.categoryId !== null && filters.categoryId !== undefined) {
             filtered = filtered.filter(p => p.categoryId === filters.categoryId);
         }
-        if (filters.brandId) {
-            filtered = filtered.filter(p => p.brandId === filters.brandId);
+
+        // 2) 브랜드 (Sidebar 에서 넘어오는 brands: ['삼성', 'LG', ...])
+        if (filters.brandIds && filters.brandIds.length > 0) {
+            filtered = filtered.filter(p =>
+                filters.brandIds.includes(p.brandId)   // ✅ ProductResponseDTO.brandId와 비교
+            );
         }
-        if (filters.minPrice) {
-            filtered = filtered.filter(p => p.productPrice >= filters.minPrice);
-        }
-        if (filters.maxPrice) {
-            filtered = filtered.filter(p => p.productPrice <= filters.maxPrice);
+
+        // 3) 가격대 (priceRange: { min: '', max: '' })
+        if (filters.priceRange) {
+            const min =
+                filters.priceRange.min !== ''
+                    ? Number(filters.priceRange.min)
+                    : null;
+            const max =
+                filters.priceRange.max !== ''
+                    ? Number(filters.priceRange.max)
+                    : null;
+
+            if (min !== null && !Number.isNaN(min)) {
+                filtered = filtered.filter(p => p.productPrice >= min);
+            }
+
+            if (max !== null && !Number.isNaN(max)) {
+                filtered = filtered.filter(p => p.productPrice <= max);
+            }
         }
 
         setFilteredProducts(filtered);
