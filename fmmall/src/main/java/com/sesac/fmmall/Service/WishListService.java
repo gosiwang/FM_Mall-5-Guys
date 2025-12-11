@@ -10,6 +10,7 @@ import com.sesac.fmmall.Repository.WishListRepository;
 import com.sesac.fmmall.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -89,22 +90,43 @@ public class WishListService {
         Product product = productRepository.findById(requestDTO.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
-        Optional<Integer> wishListItem =
-                wishListRepository.findIdByUserIdAndProductId(
-                        currentUserId, requestDTO.getProductId()
-                );
+        int deletedCount = wishListRepository.deleteByUser_UserIdAndProduct_ProductId(
+                currentUserId, requestDTO.getProductId()
+        );
 
-        if (wishListItem.isPresent()) {
-            wishListRepository.deleteById(wishListItem.get());
-            return WishListResponseDTO.removedDTO(); // 삭제
+        if (deletedCount > 0) {
+            return WishListResponseDTO.removedDTO(); // 삭제 성공 응답
         } else {
+            // 삭제 실패 (Count=0): INSERT 시도
             WishList newWishList = WishList.builder()
                     .user(user)
                     .product(product)
                     .build();
-            WishList savedWishList = wishListRepository.save(newWishList);
-            return WishListResponseDTO.from(savedWishList); // 추가
+
+            try {
+                // 동시성 위험을 DB 제약 조건으로 해결합니다.
+                WishList savedWishList = wishListRepository.save(newWishList);
+                return WishListResponseDTO.from(savedWishList); // 추가 성공 응답
+            } catch (DataIntegrityViolationException ex) {
+                throw new IllegalArgumentException("이미 위시리스트에 추가된 상품입니다.");
+            }
         }
+//        Optional<Integer> wishListItem =
+//                wishListRepository.findIdByUserIdAndProductId(
+//                        currentUserId, requestDTO.getProductId()
+//                );
+
+//        if (wishListItem.isPresent()) {
+//            wishListRepository.deleteById(wishListItem.get());
+//            return WishListResponseDTO.removedDTO(); // 삭제
+//        } else {
+//            WishList newWishList = WishList.builder()
+//                    .user(user)
+//                    .product(product)
+//                    .build();
+//            WishList savedWishList = wishListRepository.save(newWishList);
+//            return WishListResponseDTO.from(savedWishList); // 추가
+//        }
     }
 
     @Transactional

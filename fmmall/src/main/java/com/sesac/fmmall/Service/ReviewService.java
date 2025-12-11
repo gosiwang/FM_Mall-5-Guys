@@ -7,6 +7,7 @@ import com.sesac.fmmall.Entity.*;
 import com.sesac.fmmall.Repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -70,11 +71,11 @@ public class ReviewService {
         OrderItem orderItem = orderItemRepository.findById(requestDTO.getOrderItemId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
-        reviewRepository.findByOrderItem_OrderItemId(orderItem.getOrderItemId())
-                .ifPresent(review -> {
-                    // 이미 존재한다면 예외를 던집니다.
-                    throw new IllegalArgumentException("이미 해당 주문 상품에 대한 리뷰를 작성했습니다.");
-                });
+//        reviewRepository.findByOrderItem_OrderItemId(orderItem.getOrderItemId())
+//                .ifPresent(review -> {
+//                    // 이미 존재한다면 예외를 던집니다.
+//                    throw new IllegalArgumentException("이미 해당 주문 상품에 대한 리뷰를 작성했습니다.");
+//                });
 
         Order order = orderItem.getOrder();
         if (order == null || order.getUser().getUserId() != writerId) {
@@ -89,8 +90,15 @@ public class ReviewService {
                 .orderItem(orderItem)
                 .build();
 
-        // 내부적으로 EntityManager.persist() 호출되어 영속성 컨텍스트로 들어간다.
-        Review savedReview = reviewRepository.save(newReview);
+//        // 내부적으로 EntityManager.persist() 호출되어 영속성 컨텍스트로 들어간다.
+//        Review savedReview = reviewRepository.save(newReview);
+
+        Review savedReview;
+        try {
+            savedReview = reviewRepository.save(newReview);
+        } catch (DataIntegrityViolationException ex) {
+            throw new IllegalArgumentException("이미 해당 주문 상품에 대한 리뷰를 작성했습니다.");
+        }
 
         // 저장 후, 생성된 Entity를 다시 DTO로 변환하여 반환
         return ReviewResponseDTO.from(savedReview);
