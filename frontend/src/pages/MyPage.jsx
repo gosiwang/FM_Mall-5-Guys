@@ -14,6 +14,25 @@ const MyPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
+    // ✅ 배송지 추가 폼
+    const [showAddressForm, setShowAddressForm] = useState(false);
+    const [addressForm, setAddressForm] = useState({
+        receiverName: '',
+        receiverPhone: '',
+        zipcode: '',
+        address1: '',
+        address2: '',
+        isDefault: 'N', // 백엔드가 String "Y"/"N" 사용
+    });
+
+    // ✅ 결제 수단 추가 폼
+    const [showPaymentForm, setShowPaymentForm] = useState(false);
+    const [paymentForm, setPaymentForm] = useState({
+        cardCompany: '',
+        maskedCardNumber: '', // 백엔드 DTO 필드명과 맞추기
+        isDefault: false,
+    });
+
     // ✅ 리뷰 수정 관련 상태
     const [showReviewEditModal, setShowReviewEditModal] = useState(false);
     const [editingReview, setEditingReview] = useState(null);
@@ -86,6 +105,77 @@ const MyPage = () => {
             setTotalPages(response.data.totalPages || 1);
         } catch (error) {
             console.error('리뷰 로딩 실패:', error);
+        }
+    };
+
+    // =============================
+    // 배송지 추가 폼 관련
+    // =============================
+    const handleAddressFormChange = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        if (name === 'isDefault') {
+            setAddressForm((prev) => ({
+                ...prev,
+                isDefault: checked ? 'Y' : 'N',
+            }));
+            return;
+        }
+
+        setAddressForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmitAddress = async (e) => {
+        e.preventDefault();
+        try {
+            await addressAPI.addAddress(addressForm);
+            alert('배송지가 추가되었습니다.');
+            setShowAddressForm(false);
+            setAddressForm({
+                receiverName: '',
+                receiverPhone: '',
+                zipcode: '',
+                address1: '',
+                address2: '',
+                isDefault: 'N',
+            });
+            loadAddresses(); // 목록 새로고침
+        } catch (error) {
+            console.error('배송지 추가 실패:', error);
+            alert('배송지 추가에 실패했습니다.');
+        }
+    };
+
+    // =============================
+    // 결제 수단 추가 폼 관련
+    // =============================
+    const handlePaymentFormChange = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        setPaymentForm((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
+    };
+
+    const handleSubmitPayment = async (e) => {
+        e.preventDefault();
+        try {
+            await paymentAPI.addPayment(paymentForm);
+            alert('결제 수단이 추가되었습니다.');
+            setShowPaymentForm(false);
+            setPaymentForm({
+                cardCompany: '',
+                maskedCardNumber: '',
+                isDefault: false,
+            });
+            loadPayments(); // 목록 새로고침
+        } catch (error) {
+            console.error('결제 수단 추가 실패:', error);
+            alert('결제 수단 추가에 실패했습니다.');
         }
     };
 
@@ -217,7 +307,7 @@ const MyPage = () => {
                     내 정보 및 설정 관리
                 </p>
 
-                {/* ✅ 탭 메뉴 - 위시리스트, 리뷰 추가 */}
+                {/* ✅ 탭 메뉴 */}
                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #e5e7eb', flexWrap: 'wrap' }}>
                     <button
                         onClick={() => setActiveTab('info')}
@@ -274,7 +364,6 @@ const MyPage = () => {
                     >
                         ❤️ 위시리스트
                     </button>
-                    {/* ✅ 내 리뷰 탭 */}
                     <button
                         onClick={() => setActiveTab('reviews')}
                         style={{
@@ -387,8 +476,102 @@ const MyPage = () => {
                     <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                             <h3 style={{ fontSize: '1.25rem', fontWeight: '600' }}>배송지 목록</h3>
-                            <button className="btn btn--primary">+ 배송지 추가</button>
+                            <button
+                                className="btn btn--primary"
+                                onClick={() => setShowAddressForm((prev) => !prev)}
+                            >
+                                + 배송지 추가
+                            </button>
                         </div>
+
+                        {/* ✅ 배송지 추가 폼 */}
+                        {showAddressForm && (
+                            <form
+                                onSubmit={handleSubmitAddress}
+                                style={{
+                                    marginBottom: '1.5rem',
+                                    padding: '1rem',
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '0.5rem',
+                                    backgroundColor: '#f9fafb',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '0.5rem',
+                                }}
+                            >
+                                <div>
+                                    <label>받는 사람 이름</label>
+                                    <input
+                                        name="receiverName"
+                                        value={addressForm.receiverName}
+                                        onChange={handleAddressFormChange}
+                                        className="input"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label>전화번호</label>
+                                    <input
+                                        name="receiverPhone"
+                                        value={addressForm.receiverPhone}
+                                        onChange={handleAddressFormChange}
+                                        className="input"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label>우편번호</label>
+                                    <input
+                                        name="zipcode"
+                                        value={addressForm.zipcode}
+                                        onChange={handleAddressFormChange}
+                                        className="input"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label>주소</label>
+                                    <input
+                                        name="address1"
+                                        value={addressForm.address1}
+                                        onChange={handleAddressFormChange}
+                                        className="input"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label>상세 주소</label>
+                                    <input
+                                        name="address2"
+                                        value={addressForm.address2}
+                                        onChange={handleAddressFormChange}
+                                        className="input"
+                                    />
+                                </div>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        name="isDefault"
+                                        checked={addressForm.isDefault === 'Y'}
+                                        onChange={handleAddressFormChange}
+                                    />
+                                    기본 배송지로 설정
+                                </label>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                    <button type="submit" className="btn btn--primary">
+                                        저장
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn--ghost"
+                                        onClick={() => setShowAddressForm(false)}
+                                    >
+                                        취소
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+
                         {addresses.length === 0 ? (
                             <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>
                                 등록된 배송지가 없습니다.
@@ -397,7 +580,7 @@ const MyPage = () => {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {addresses.map((address) => (
                                     <div
-                                        key={address.addressId}
+                                        key={address.id}
                                         style={{
                                             padding: '1.25rem',
                                             border: '1px solid #e5e7eb',
@@ -406,8 +589,8 @@ const MyPage = () => {
                                         }}
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                                            <div style={{ fontWeight: '500' }}>{address.nickname}</div>
-                                            {address.isDefault && (
+                                            <div style={{ fontWeight: '500' }}>{address.receiverName}</div>
+                                            {address.isDefault === 'Y' && (
                                                 <span style={{
                                                     padding: '0.125rem 0.5rem',
                                                     backgroundColor: '#dbeafe',
@@ -420,20 +603,17 @@ const MyPage = () => {
                                             )}
                                         </div>
                                         <div style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-                                            [{address.postalCode}] {address.address}
-                                        </div>
-                                        <div style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-                                            {address.detailAddress}
+                                            [{address.zipcode}] {address.address1} {address.address2}
                                         </div>
                                         <div style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
-                                            {address.phoneNumber}
+                                            {address.receiverPhone}
                                         </div>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button className="btn btn--ghost" style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}>
                                                 수정
                                             </button>
                                             <button
-                                                onClick={() => handleDeleteAddress(address.addressId)}
+                                                onClick={() => handleDeleteAddress(address.id)}
                                                 className="btn btn--outline"
                                                 style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem', borderColor: '#ef4444', color: '#ef4444' }}
                                             >
@@ -452,8 +632,73 @@ const MyPage = () => {
                     <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                             <h3 style={{ fontSize: '1.25rem', fontWeight: '600' }}>결제 수단 목록</h3>
-                            <button className="btn btn--primary">+ 결제 수단 추가</button>
+                            <button
+                                className="btn btn--primary"
+                                onClick={() => setShowPaymentForm((prev) => !prev)}
+                            >
+                                + 결제 수단 추가
+                            </button>
                         </div>
+
+                        {/* ✅ 결제 수단 추가 폼 */}
+                        {showPaymentForm && (
+                            <form
+                                onSubmit={handleSubmitPayment}
+                                style={{
+                                    marginBottom: '1.5rem',
+                                    padding: '1rem',
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '0.5rem',
+                                    backgroundColor: '#f9fafb',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '0.5rem',
+                                }}
+                            >
+                                <div>
+                                    <label>카드사</label>
+                                    <input
+                                        name="cardCompany"
+                                        value={paymentForm.cardCompany}
+                                        onChange={handlePaymentFormChange}
+                                        className="input"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label>표시용 카드 번호 (예: ****-****-****-1234)</label>
+                                    <input
+                                        name="maskedCardNumber"
+                                        value={paymentForm.maskedCardNumber}
+                                        onChange={handlePaymentFormChange}
+                                        className="input"
+                                        required
+                                    />
+                                </div>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        name="isDefault"
+                                        checked={paymentForm.isDefault}
+                                        onChange={handlePaymentFormChange}
+                                    />
+                                    기본 결제 수단으로 설정
+                                </label>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                    <button type="submit" className="btn btn--primary">
+                                        저장
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn--ghost"
+                                        onClick={() => setShowPaymentForm(false)}
+                                    >
+                                        취소
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+
                         {payments.length === 0 ? (
                             <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>
                                 등록된 결제 수단이 없습니다.
@@ -462,7 +707,7 @@ const MyPage = () => {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {payments.map((payment) => (
                                     <div
-                                        key={payment.paymentMethodId}
+                                        key={payment.id}
                                         style={{
                                             padding: '1.25rem',
                                             border: '1px solid #e5e7eb',
@@ -471,7 +716,7 @@ const MyPage = () => {
                                         }}
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                                            <div style={{ fontWeight: '500' }}>{payment.cardNickname}</div>
+                                            <div style={{ fontWeight: '500' }}>{payment.cardCompany}</div>
                                             {payment.isDefault && (
                                                 <span style={{
                                                     padding: '0.125rem 0.5rem',
@@ -485,14 +730,14 @@ const MyPage = () => {
                                             )}
                                         </div>
                                         <div style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
-                                            **** **** **** {payment.cardNumber?.slice(-4) || '****'}
+                                            {payment.maskedCardNumber}
                                         </div>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button className="btn btn--ghost" style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}>
                                                 수정
                                             </button>
                                             <button
-                                                onClick={() => handleDeletePayment(payment.paymentMethodId)}
+                                                onClick={() => handleDeletePayment(payment.id)}
                                                 className="btn btn--outline"
                                                 style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem', borderColor: '#ef4444', color: '#ef4444' }}
                                             >

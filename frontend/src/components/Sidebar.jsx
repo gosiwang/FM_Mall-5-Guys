@@ -4,10 +4,18 @@ import { categoryAPI } from '../services/api';
 const Sidebar = ({ onFilterChange }) => {
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const [selectedBrands, setSelectedBrands] = useState([]);
+
+    // ✅ 브랜드는 "이름 문자열"이 아니라 "ID 배열"로 관리
+    const [selectedBrandIds, setSelectedBrandIds] = useState([]);
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
 
-    const brands = ['삼성', 'LG', '다이슨', '기타'];
+    // ✅ 실제 DB brand_id 값에 맞게 수정해야 함
+    const brands = [
+        { id: 1, label: '삼성' },
+        { id: 2, label: 'LG' },
+        { id: 3, label: '다이슨' },
+        { id: 4, label: '기타' },
+    ];
 
     useEffect(() => {
         loadCategories();
@@ -16,7 +24,7 @@ const Sidebar = ({ onFilterChange }) => {
     const loadCategories = async () => {
         try {
             const response = await categoryAPI.getAllCategories();
-            console.log('카테고리 데이터:', response.data); // ✅ 디버깅용
+            console.log('카테고리 데이터:', response.data);
             setCategories(response.data || []);
         } catch (error) {
             console.error('카테고리 로딩 실패:', error);
@@ -24,23 +32,10 @@ const Sidebar = ({ onFilterChange }) => {
         }
     };
 
-    const handleCategoryClick = (categoryId) => {
-        setSelectedCategory(categoryId);
-        applyFilters({ categoryId, brands: selectedBrands, priceRange });
-    };
-
-    const handleBrandChange = (brand) => {
-        const updatedBrands = selectedBrands.includes(brand)
-            ? selectedBrands.filter(b => b !== brand)
-            : [...selectedBrands, brand];
-
-        setSelectedBrands(updatedBrands);
-    };
-
-    const applyFilters = (filters = null) => {
-        const filterData = filters || {
+    const applyFilters = (filtersOverride = null) => {
+        const filterData = filtersOverride || {
             categoryId: selectedCategory,
-            brands: selectedBrands,
+            brandIds: selectedBrandIds,   // ✅ brandIds로 통일
             priceRange
         };
 
@@ -49,8 +44,34 @@ const Sidebar = ({ onFilterChange }) => {
         }
     };
 
+    const handleCategoryClick = (categoryId) => {
+        setSelectedCategory(categoryId);
+
+        applyFilters({
+            categoryId,
+            brandIds: selectedBrandIds,
+            priceRange
+        });
+    };
+
+    const handleBrandChange = (brandId) => {
+        const updated = selectedBrandIds.includes(brandId)
+            ? selectedBrandIds.filter(id => id !== brandId)
+            : [...selectedBrandIds, brandId];
+
+        setSelectedBrandIds(updated);
+
+        // ✅ 브랜드 선택 바뀔 때마다 바로 필터 적용
+        applyFilters({
+            categoryId: selectedCategory,
+            brandIds: updated,
+            priceRange
+        });
+    };
+
     return (
         <aside className="sidebar">
+            {/* 카테고리 섹션 */}
             <section className="sidebar__section">
                 <h2 className="sidebar__title">카테고리</h2>
                 <ul className="sidebar__list">
@@ -63,7 +84,7 @@ const Sidebar = ({ onFilterChange }) => {
                             }}
                             style={{
                                 fontWeight: selectedCategory === null ? 'bold' : 'normal',
-                                color: selectedCategory === null ? '#111827' : '#4b5563'
+                                color: selectedCategory === null ? '#111827' : '#4b5563',
                             }}
                         >
                             전체
@@ -78,11 +99,14 @@ const Sidebar = ({ onFilterChange }) => {
                                     handleCategoryClick(category.categoryId);
                                 }}
                                 style={{
-                                    fontWeight: selectedCategory === category.categoryId ? 'bold' : 'normal',
-                                    color: selectedCategory === category.categoryId ? '#111827' : '#4b5563'
+                                    fontWeight:
+                                        selectedCategory === category.categoryId ? 'bold' : 'normal',
+                                    color:
+                                        selectedCategory === category.categoryId
+                                            ? '#111827'
+                                            : '#4b5563',
                                 }}
                             >
-                                {/* ✅ categoryName으로 수정 */}
                                 {category.categoryName}
                             </a>
                         </li>
@@ -90,20 +114,22 @@ const Sidebar = ({ onFilterChange }) => {
                 </ul>
             </section>
 
+            {/* 브랜드 섹션 */}
             <section className="sidebar__section">
                 <h2 className="sidebar__title">브랜드</h2>
                 {brands.map((brand) => (
-                    <label key={brand} className="sidebar__checkbox">
+                    <label key={brand.id} className="sidebar__checkbox">
                         <input
                             type="checkbox"
-                            checked={selectedBrands.includes(brand)}
-                            onChange={() => handleBrandChange(brand)}
+                            checked={selectedBrandIds.includes(brand.id)}
+                            onChange={() => handleBrandChange(brand.id)}
                         />
-                        {brand}
+                        {brand.label}
                     </label>
                 ))}
             </section>
 
+            {/* 가격대 섹션 */}
             <section className="sidebar__section">
                 <h2 className="sidebar__title">가격대</h2>
                 <div className="price-range">
@@ -111,14 +137,18 @@ const Sidebar = ({ onFilterChange }) => {
                         type="number"
                         placeholder="최소"
                         value={priceRange.min}
-                        onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                        onChange={(e) =>
+                            setPriceRange({ ...priceRange, min: e.target.value })
+                        }
                     />
                     <span>~</span>
                     <input
                         type="number"
                         placeholder="최대"
                         value={priceRange.max}
-                        onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                        onChange={(e) =>
+                            setPriceRange({ ...priceRange, max: e.target.value })
+                        }
                     />
                 </div>
                 <button
