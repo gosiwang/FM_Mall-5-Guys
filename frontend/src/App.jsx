@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Iridescence from './components/background/Iridescence';
 import Header from './components/Header';
 import MainPage from './pages/MainPage';
 import LoginPage from './pages/LoginPage';
@@ -15,14 +16,19 @@ import SignupPage from "./pages/SignupPage";
 import Footer from "./components/Footer";
 import CartCheckoutPage from "./pages/CartCheckoutPage";
 
-
-
-
-
 function App() {
     return (
         <Router>
-        <div>
+            <div className="iridescence-background">
+                <Iridescence
+                    color={[0.3, 0.5, 0.75]}
+                    mouseReact={false}
+                    amplitude={0.05}
+                    speed={0.5}
+                />
+            </div>
+
+            <div className="app-content">
                 <Header />
                 <Routes>
                     <Route path="/" element={<MainPage />} />
@@ -32,19 +38,15 @@ function App() {
                     <Route path="/cart/checkout" element={<CartCheckoutPage />} />
                     <Route path="/orders" element={<OrderListPage />} />
                     <Route path="/orders/:orderId" element={<OrderDetailPage />} />
-
-
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/wishlist" element={<WishListPage />} />
-
-
                     <Route path="/admin" element={<AdminPage />} />
                     <Route path="/admin/products" element={<AdminProductPage />} />
                     <Route path="/admin/users" element={<AdminUserPage />} />
                 </Routes>
+                <Footer />
             </div>
 
-            <Footer />
 
         </Router>
     );

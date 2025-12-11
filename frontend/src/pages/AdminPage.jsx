@@ -58,14 +58,14 @@ const AdminPage = () => {
             color: '#10b981',
             stats: `${stats.totalUsers}명 사용자`
         },
-        {
+    /*    {
             title: '카테고리 관리',
             description: '카테고리 설정',
             icon: '📂',
             path: '/admin/categories',
             color: '#f59e0b',
             stats: '카테고리 설정'
-        },
+        },*/
     /*    {
             title: '브랜드 관리',
             description: '브랜드 등록 및 관리',
