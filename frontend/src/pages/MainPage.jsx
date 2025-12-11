@@ -41,7 +41,7 @@ const MainPage = () => {
     };
 
     const handleIntroComplete = () => {
-        markIntroAsViewed(); // ✅ sessionStorage에 저장
+        markIntroAsViewed();
         setShowIntro(false);
         setTimeout(() => setIntroComplete(true), 500);
     };

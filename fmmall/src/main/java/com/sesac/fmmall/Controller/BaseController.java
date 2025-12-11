@@ -15,7 +15,6 @@ public abstract class BaseController {
 
         Object principal = auth.getPrincipal();
 
-        // ✅ 우리가 설정한 CustomUserDetails인 경우
         if (principal instanceof CustomUserDetails customUserDetails) {
             return customUserDetails.getUser().getUserId();
         }

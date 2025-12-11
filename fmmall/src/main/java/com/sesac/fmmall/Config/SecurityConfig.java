@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(b -> b.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // 공개 엔드포인트
+                        // 비회원
                         .requestMatchers("/User/login", "/User/signup").permitAll()
                         .requestMatchers("/Product/**").permitAll()
                         .requestMatchers("/Category/**").permitAll()
@@ -44,7 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/Brand/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                        // 일반 사용자 인증 필요 엔드포인트
+                        // 일반 사용자
                         .requestMatchers("/User/**").authenticated()
                         .requestMatchers("/Address/**").authenticated()
                         .requestMatchers("/Payment/**").authenticated()
@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/Refund/**").authenticated()
                         .requestMatchers("/Inquiry/**").authenticated()
 
-                        // 관리자 전용 엔드포인트
+                        // 관리자 전용
                         .requestMatchers("/Admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
