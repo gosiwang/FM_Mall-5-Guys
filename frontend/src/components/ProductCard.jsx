@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cartAPI, wishlistAPI } from '../services/api';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, wishlistedProductIds = [] }) => {
     const navigate = useNavigate();
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+
+    // ✅ 컴포넌트가 마운트될 때 위시리스트 상태 확인
+    useEffect(() => {
+        // wishlistedProductIds 배열에 현재 제품 ID가 있는지 확인
+        setIsWishlisted(wishlistedProductIds.includes(product.productId));
+    }, [wishlistedProductIds, product.productId]);
 
     const handleCardClick = () => {
         navigate(`/product/${product.productId}`);
@@ -66,10 +72,7 @@ const ProductCard = ({ product }) => {
                 productId: product.productId
             });
 
-            // ✅ 수정: isAdded 또는 added 둘 다 확인
-            console.log('위시리스트 응답:', response.data); // 👈 디버깅용
             const isAdded = response.data.isAdded ?? response.data.added;
-
             setIsWishlisted(isAdded);
 
             if (isAdded) {
@@ -100,7 +103,7 @@ const ProductCard = ({ product }) => {
                 <div className="product-card__badge product-card__badge--green">HOT</div>
             )}
 
-            {/* ✅ 위시리스트 버튼 추가 */}
+            {/* ✅ 위시리스트 버튼 */}
             <button
                 className={`product-card__wishlist ${isWishlisted ? 'product-card__wishlist--active' : ''}`}
                 onClick={handleWishlistToggle}
@@ -125,7 +128,7 @@ const ProductCard = ({ product }) => {
                     zIndex: 10
                 }}
             >
-                {isWishlisted ? '❤️' : '🤍'}
+                {isWishlisted ? '💝' : '🤍'}
             </button>
 
             <div className="product-card__image">

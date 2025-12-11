@@ -164,7 +164,13 @@ a {
     border-radius: 0.75rem;
     padding: 1.25rem;
     border: 1px solid rgba(229, 231, 235, 0.6);
+
+
+    position: sticky;
+    top: 13.5rem;  /* 헤더 아래 1rem 간격 */
     align-self: flex-start;
+    max-height: calc(100vh - 2rem);  /* 화면 높이에 맞춤 */
+    overflow-y: auto;  /* 내용이 많으면 스크롤 */
 }
 
 .sidebar__section + .sidebar__section {

@@ -21,10 +21,10 @@ function App() {
         <Router>
             <div className="iridescence-background">
                 <Iridescence
-                    color={[0.3, 0.5, 0.75]}
+                    color={[0.55, 0.6, 0.85]}
                     mouseReact={false}
-                    amplitude={0.05}
-                    speed={0.5}
+                    amplitude={1.0}
+                    speed={1.0}
                 />
             </div>
 
