@@ -13,7 +13,6 @@ import com.sesac.fmmall.Repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
  * - 주문 조회 (전체 / 단건 / 상품 기준)
  * - 주문 취소
  */
-
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -72,7 +70,6 @@ public class OrderService {
 
         // 3. 배송지 선택 (addressId 있으면 해당 주소, 없으면 기본 배송지 사용)
         Address shippingAddress;
-
         if (request.getAddressId() != null) {
             shippingAddress = addressRepository.findById(request.getAddressId())
                     .orElseThrow(() -> new IllegalArgumentException(
